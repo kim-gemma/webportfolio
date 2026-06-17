@@ -1,0 +1,561 @@
+/* ============================================================
+   디자인 토큰 — "코드 정원" 픽셀 포트폴리오
+   ============================================================ */
+:root {
+  --color-bg: #1a1f2e;
+  --color-panel: #252b3d;
+  --color-panel-raised: #2e3550;
+  --color-grass: #4a7c59;
+  --color-accent: #f4a259;
+  --color-accent-soft: #f4a25933;
+  --color-teal: #7ec8c9;
+  --color-text: #f0ebe1;
+  --color-text-dim: #b7b2a5;
+  --color-border: #3a4160;
+  --font-display: "Press Start 2P", "DungGeunMo", monospace;
+  --font-body: "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace, sans-serif;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: var(--color-teal);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ------------------------------------------------------------
+   인트로 화면
+   ------------------------------------------------------------ */
+.intro-screen {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 20%, #2a3550 0%, var(--color-bg) 60%);
+  padding: 24px;
+}
+
+.intro-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(124, 200, 201, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 200, 201, 0.06) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.intro-card {
+  position: relative;
+  z-index: 1;
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 40px 36px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 0 6px rgba(244, 162, 89, 0.08), 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.intro-badge {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--color-bg);
+  background: var(--color-accent);
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-bottom: 18px;
+}
+
+.intro-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin: 0 0 12px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+.intro-role {
+  font-size: 14px;
+  color: var(--color-teal);
+  margin: 0 0 14px;
+  font-weight: 600;
+}
+
+.intro-tagline {
+  font-size: 13px;
+  color: var(--color-text-dim);
+  line-height: 1.7;
+  margin: 0 0 28px;
+}
+
+.btn-primary {
+  font-family: var(--font-display);
+  font-size: 12px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  padding: 16px 22px;
+  border-radius: var(--radius-md);
+  width: 100%;
+  box-shadow: 0 4px 0 #c4863f;
+  transition: transform 0.08s ease;
+}
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #c4863f;
+}
+
+.intro-skip {
+  font-size: 12px;
+  color: var(--color-text-dim);
+  margin: 16px 0 0;
+}
+
+.intro-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px dashed var(--color-border);
+  font-size: 11px;
+  color: var(--color-text-dim);
+}
+
+/* ------------------------------------------------------------
+   앱 셸 / 게임 스테이지
+   ------------------------------------------------------------ */
+.app-shell {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--color-panel);
+  border-bottom: 2px solid var(--color-border);
+  z-index: 10;
+}
+
+.top-bar-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--color-accent);
+}
+
+.top-bar-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.top-bar-link {
+  background: transparent;
+  border: none;
+  color: var(--color-text-dim);
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.top-bar-link:hover {
+  background: var(--color-panel-raised);
+  color: var(--color-text);
+}
+
+.game-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.game-stage canvas {
+  display: block;
+}
+
+.zone-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-panel);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  animation: bob 1.2s ease-in-out infinite;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.zone-hint-icon {
+  font-size: 16px;
+}
+
+.zone-hint-key {
+  font-size: 10px;
+  color: var(--color-bg);
+  background: var(--color-accent);
+  padding: 3px 7px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -6px); }
+}
+
+.footer-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-text-dim);
+  padding: 8px;
+  background: var(--color-panel);
+  border-top: 1px solid var(--color-border);
+}
+
+/* ------------------------------------------------------------
+   가상 조이스틱
+   ------------------------------------------------------------ */
+.joystick-base {
+  position: absolute;
+  bottom: 70px;
+  left: 30px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba(37, 43, 61, 0.7);
+  border: 2px solid var(--color-border);
+  z-index: 6;
+  touch-action: none;
+}
+
+.joystick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* ------------------------------------------------------------
+   모달
+   ------------------------------------------------------------ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 20px;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-panel {
+  position: relative;
+  background: var(--color-panel);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  max-width: 640px;
+  width: 100%;
+  max-height: 84vh;
+  overflow-y: auto;
+  padding: 32px;
+  box-shadow: 0 0 0 6px rgba(244, 162, 89, 0.06), 0 30px 80px rgba(0,0,0,0.5);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--color-panel-raised);
+  border: none;
+  color: var(--color-text);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+.modal-close:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.modal-eyebrow {
+  font-size: 12px;
+  color: var(--color-accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.modal-meta {
+  font-size: 12px;
+  color: var(--color-text-dim);
+  margin: 0 0 20px;
+}
+
+.modal-paragraph {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--color-text);
+  margin: 0 0 14px;
+}
+
+/* Skills */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+@media (max-width: 520px) {
+  .skills-grid { grid-template-columns: 1fr; }
+}
+
+.skill-card {
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.skill-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.skill-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.skill-category {
+  font-size: 10px;
+  color: var(--color-teal);
+  text-transform: uppercase;
+}
+
+.skill-level {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.skill-pip {
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--color-border);
+}
+.skill-pip.on {
+  background: var(--color-accent);
+}
+
+.skill-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text-dim);
+  margin: 0;
+}
+
+/* Timeline (Experience) */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px dashed var(--color-border);
+}
+
+.timeline-item {
+  position: relative;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -27px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px var(--color-panel);
+}
+
+.timeline-year {
+  font-size: 11px;
+  color: var(--color-teal);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.timeline-company {
+  font-size: 15px;
+  margin: 0 0 2px;
+}
+
+.timeline-role {
+  font-size: 12px;
+  color: var(--color-text-dim);
+  margin-bottom: 8px;
+}
+
+.timeline-summary {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0 0 10px;
+}
+
+.timeline-highlights {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--color-text-dim);
+  line-height: 1.8;
+}
+
+/* Projects */
+.projects-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.project-card {
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.project-name {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+
+.project-desc {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-text-dim);
+  margin: 0 0 12px;
+}
+
+.project-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.project-tag {
+  font-size: 10px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.project-link {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Contact */
+.contact-email {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 8px 0 20px;
+}
+
+.contact-links {
+  display: flex;
+  gap: 12px;
+}
+
+.contact-link {
+  font-size: 13px;
+  background: var(--color-panel-raised);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+/* ------------------------------------------------------------
+   접근성: 모션 축소 선호 시
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .zone-hint {
+    animation: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
