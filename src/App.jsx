@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import Phaser from "phaser";
-import { createGardenScene } from "./game/gardenScene";
-import { IntroScene } from "./game/introScene";
+import { useRef, useEffect, useCallback } from "react";
+import { GameProvider, useGame } from "./context/GameContext";
+import { usePhaserGame, useKeyboardInput } from "./hooks";
 
 import TopBar from "./components/TopBar";
 import ZoneHint from "./components/ZoneHint";
@@ -9,127 +8,87 @@ import FooterHint from "./components/FooterHint";
 import VirtualJoystick from "./components/VirtualJoystick";
 import ZoneModal from "./components/ZoneModal";
 
-export default function App() {
+function GameContent() {
   const gameContainerRef = useRef(null);
-  const gameRef = useRef(null);
-  const sceneRef = useRef(null);
+  const { activeZone, closeZone, isMobile, setIsMobile, currentScene, openZone } = useGame();
 
-  const [activeZone, setActiveZone] = useState(null);
-  const [hintZone, setHintZone] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
+  // 게임 인스턴스 초기화
+  usePhaserGame(gameContainerRef);
+  
+  // 키보드 입력 처리
+  useKeyboardInput();
 
+  // 모바일 감지
   useEffect(() => {
-    setIsMobile(
-      window.matchMedia("(max-width: 768px), (pointer: coarse)").matches
+    const handleMediaChange = () => {
+      setIsMobile(
+        window.matchMedia("(max-width: 768px), (pointer: coarse)").matches
+      );
+    };
+
+    handleMediaChange();
+    const mediaQuery = window.matchMedia(
+      "(max-width: 768px), (pointer: coarse)"
     );
-  }, []);
+    mediaQuery.addEventListener("change", handleMediaChange);
 
-  const handleZoneEnter = useCallback((key) => {
-    setHintZone(key);
-  }, []);
+    return () => mediaQuery.removeEventListener("change", handleMediaChange);
+  }, [setIsMobile]);
 
-  const handleZoneExit = useCallback(() => {
-    setHintZone(null);
-  }, []);
-
-  const handleReady = useCallback((scene) => {
-    sceneRef.current = scene;
-  }, []);
-
+  // Escape 키로 모달 닫기
   useEffect(() => {
-    if (!gameContainerRef.current || gameRef.current) return;
-
-    const GardenScene = createGardenScene({
-      onZoneEnter: handleZoneEnter,
-      onZoneExit: handleZoneExit,
-      onReady: handleReady,
-    });
-
-    const config = {
-      type: Phaser.AUTO,
-      parent: gameContainerRef.current,
-      width: gameContainerRef.current.clientWidth,
-      height: gameContainerRef.current.clientHeight,
-      backgroundColor: "#1a1f2e",
-      physics: {
-        default: "arcade",
-        arcade: {
-          debug: false,
-        },
-      },
-      scene: [IntroScene, GardenScene],
-      pixelArt: true,
-      scale: {
-        mode: Phaser.Scale.RESIZE,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-      },
-    };
-
-    gameRef.current = new Phaser.Game(config);
-
-    const handleResize = () => {
-      if (gameRef.current && gameContainerRef.current) {
-        gameRef.current.scale.resize(
-          gameContainerRef.current.clientWidth,
-          gameContainerRef.current.clientHeight
-        );
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-
-      if (gameRef.current) {
-        gameRef.current.destroy(true);
-        gameRef.current = null;
-      }
-    };
-  }, [handleZoneEnter, handleZoneExit, handleReady]);
-
-  useEffect(() => {
-    const onKey = (e) => {
-      if (
-        (e.code === "Enter" || e.code === "Space") &&
-        hintZone &&
-        !activeZone
-      ) {
-        setActiveZone(hintZone);
-      }
-
+    const handleKeyDown = (e) => {
       if (e.code === "Escape" && activeZone) {
-        setActiveZone(null);
+        closeZone();
       }
     };
 
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [hintZone, activeZone]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeZone, closeZone]);
 
   const handleJoystick = useCallback((x, y) => {
-    if (sceneRef.current) {
-      sceneRef.current.setJoystickVector(x, y);
+    if (currentScene) {
+      currentScene.setJoystickVector(x, y);
     }
-  }, []);
+  }, [currentScene]);
+
+  const handleTopBarSelect = useCallback((key) => {
+    if (key === "home") {
+      closeZone();
+      if (currentScene?.movePlayerHome) {
+        currentScene.movePlayerHome();
+      }
+      return;
+    }
+
+    openZone(key);
+  }, [currentScene, closeZone, openZone]);
 
   return (
     <div className="app-shell">
-      <TopBar onZoneSelect={setActiveZone} />
+      <TopBar onZoneSelect={handleTopBarSelect} />
 
       <div className="game-stage" ref={gameContainerRef}>
-        {hintZone && !activeZone && (
-          <ZoneHint zoneKey={hintZone} isMobile={isMobile} />
-        )}
+        {/* 게임 캔버스가 렌더링되는 영역 */}
+        {/* ZoneHint는 게임 위에 오버레이됨 */}
       </div>
 
       {isMobile && <VirtualJoystick onMove={handleJoystick} />}
 
       {activeZone && (
-        <ZoneModal zoneKey={activeZone} onClose={() => setActiveZone(null)} />
+        <ZoneModal zoneKey={activeZone} onClose={closeZone} />
       )}
 
       <FooterHint isMobile={isMobile} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <GameProvider>
+      <GameContent />
+    </GameProvider>
   );
 }

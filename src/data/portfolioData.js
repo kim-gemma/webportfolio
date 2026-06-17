@@ -5,7 +5,7 @@
 
 export const PORTFOLIO_DATA = {
   profile: {
-    name: "김현능",
+    name: "김현ㅇㅇ능",
     role: "프론트엔드 개발자",
     tagline: "사용자 경험과 성능, 둘 다 놓치지 않는 코드를 씁니다",
     location: "서울, 대한민국",

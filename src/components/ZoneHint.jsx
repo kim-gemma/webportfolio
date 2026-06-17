@@ -1,13 +1,15 @@
-const ZONE_META = {
-  about: { title: "About Me", icon: "🏠" },
-  skills: { title: "Skills", icon: "📚" },
-  experience: { title: "Experience", icon: "📜" },
-  projects: { title: "Projects", icon: "🖼" },
-  contact: { title: "Contact", icon: "📮" },
-};
+import { useMemo } from "react";
+import { useGame } from "../context/GameContext";
+import { ZONE_META } from "../config/zonesConfig";
 
 export default function ZoneHint({ zoneKey, isMobile }) {
+  const { hintZone } = useGame();
   const meta = ZONE_META[zoneKey];
+
+  const isVisible = useMemo(() => hintZone === zoneKey, [hintZone, zoneKey]);
+
+  if (!isVisible) return null;
+
   return (
     <div className="zone-hint">
       <span className="zone-hint-icon">{meta.icon}</span>

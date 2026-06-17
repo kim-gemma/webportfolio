@@ -170,8 +170,10 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 12px 20px;
-  background: var(--color-panel);
+  background: rgba(37, 43, 61, 0.78);
+  backdrop-filter: blur(6px);
   border-bottom: 2px solid var(--color-border);
   z-index: 10;
 }
@@ -180,25 +182,59 @@ a:hover {
   font-family: var(--font-display);
   font-size: 12px;
   color: var(--color-accent);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .top-bar-nav {
   display: flex;
   gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+}
+.top-bar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .top-bar-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--color-text-dim);
   font-size: 12px;
   padding: 8px 10px;
   border-radius: 6px;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 .top-bar-link:hover {
   background: var(--color-panel-raised);
   color: var(--color-text);
+}
+.top-bar-link.active {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--zone-color) 22%, transparent);
+  border-color: var(--zone-color);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--zone-color) 40%, transparent);
+}
+.top-bar-link-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .top-bar {
+    padding: 10px 12px;
+  }
+  .top-bar-link {
+    padding: 6px 8px;
+    font-size: 0;
+  }
+  .top-bar-link-icon {
+    font-size: 16px;
+  }
 }
 
 .game-stage {
@@ -252,7 +288,8 @@ a:hover {
   font-size: 11px;
   color: var(--color-text-dim);
   padding: 8px;
-  background: var(--color-panel);
+  background: rgba(37, 43, 61, 0.78);
+  backdrop-filter: blur(6px);
   border-top: 1px solid var(--color-border);
 }
 
@@ -304,15 +341,22 @@ a:hover {
   to { opacity: 1; }
 }
 
+@keyframes modalRise {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .modal-panel {
   position: relative;
   background: var(--color-panel);
   border: 3px solid var(--color-border);
+  border-top: 5px solid var(--zone-color, var(--color-accent));
   border-radius: var(--radius-lg);
   max-width: 640px;
   width: 100%;
   max-height: 84vh;
   overflow-y: auto;
+  animation: modalRise 0.22s ease;
   padding: 32px;
   box-shadow: 0 0 0 6px rgba(244, 162, 89, 0.06), 0 30px 80px rgba(0,0,0,0.5);
 }
