@@ -10,6 +10,9 @@ export default function ContactContent() {
       <a href={`mailto:${contact.email}`} className="contact-email">
         {contact.email}
       </a>
+      <a href={`tel:${contact.phone}`} className="contact-email">
+        {contact.phone}
+      </a>
       <div className="contact-links">
         {contact.links.map((l) => (
           <a

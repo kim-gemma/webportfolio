@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { PORTFOLIO_DATA } from "../data/portfolioData";
 
 export class IntroScene extends Phaser.Scene {
   constructor() {
@@ -30,7 +31,7 @@ export class IntroScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(...this.toScreen(384, 225), "FRONT-END DEVELOPER PORTFOLIO", {
+      .text(...this.toScreen(384, 225), PORTFOLIO_DATA.profile.role.toUpperCase(), {
         fontFamily: "monospace",
         fontSize: `${20 * scale}px`,
         color: "#ffffff",

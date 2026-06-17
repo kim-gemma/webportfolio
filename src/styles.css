@@ -570,11 +570,15 @@ a:hover {
 
 /* Contact */
 .contact-email {
-  display: inline-block;
+  display: block;
   font-size: 16px;
   font-weight: 700;
   color: var(--color-accent);
-  margin: 8px 0 20px;
+  margin: 4px 0;
+}
+
+.contact-email:last-of-type {
+  margin-bottom: 20px;
 }
 
 .contact-links {
