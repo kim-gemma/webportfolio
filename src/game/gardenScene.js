@@ -32,6 +32,14 @@ const COLORS = {
   playerBody: 0xf4a259,
   playerShirt: 0x7ec8c9,
   outline: 0x1a1f2e,
+  lampPole: 0x3a3a3a,
+  lampGlow: 0xfff4cc,
+  fountainBase: 0xcfc9bd,
+  fountainWater: 0x4a78a0,
+  dogBody: 0xc99a5b,
+  dogDark: 0xa9794a,
+  bedSoil: 0x6b4a2f,
+  bedBorder: 0x8a6d4b,
 };
 
 // 맵 위 의미있는 구역들. 좌표는 타일 기준.
@@ -127,6 +135,8 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
 
       this.foodTrucks = [];
       this.vehicles = [];
+      this.dogs = [];
+      this.fountains = [];
       this.activeBubble = null;
       this.obstacles = this.physics.add.staticGroup();
 
@@ -138,6 +148,10 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       this.createCrowdCharacters();
       // this.createAnimatedFoodTruck(TILE * MAP_COLS + 260, 120);
       this.createVehicles();
+      this.createBird();
+      this.createCherryBlossoms();
+      this.createFountainSoundIcon();
+      this.createProjectsSparkle();
       this.createPlayer();
       this.createCompass();
       this.createInteractPrompt();
@@ -157,8 +171,12 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       this.drawCityGround(offsetX);
       this.drawRoad(offsetX);
       this.drawDecorations(offsetX);
+      this.drawFlowerBeds(offsetX);
+      this.drawStreetLamps(offsetX);
       this.drawBenches(offsetX);
       this.drawZoneBuildings(offsetX);
+      this.createFountainForScreen(offsetX);
+      this.createDogForScreen(offsetX);
     }
 
     // 차량이 다니는 2차선 도로 (인도 영역 안쪽, 건물/나무와 겹치지 않는 띠)
@@ -261,9 +279,8 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
     }
 
 
-    // 나무(충돌 있음), 꽃(분위기용, 충돌 없음) 장식
+    // 나무(충돌 있음, 잎이 살짝 흔들림), 꽃(분위기용, 충돌 없음, 바람에 흔들림) 장식
     drawDecorations(offsetX = 0) {
-      const g = this.add.graphics();
       const treeSpots = [
         [1, 1], [1, 14], [22, 1], [22, 14],
         [7, 1], [16, 1], [1, 7], [22, 8],
@@ -272,15 +289,7 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       treeSpots.forEach(([col, row]) => {
         const cx = offsetX + col * TILE + TILE / 2;
         const cy = row * TILE + TILE / 2;
-        g.fillStyle(COLORS.treeTrunk, 1);
-        g.fillRect(cx - 4, cy + 2, 8, 12);
-        g.fillStyle(COLORS.treeLeaf, 1);
-        g.fillCircle(cx, cy - 6, 14);
-        g.fillStyle(COLORS.treeLeafLight, 1);
-        g.fillCircle(cx - 4, cy - 10, 8);
-
-        // 줄기 부분만 막아서 발이 걸리는 느낌을 자연스럽게 한다
-        this.createObstacle(cx, cy + 8, 16, 18);
+        this.createSwayingTree(cx, cy);
       });
 
       const flowerSpots = [
@@ -292,14 +301,62 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       flowerSpots.forEach(([col, row, color]) => {
         const cx = offsetX + col * TILE + TILE / 2;
         const cy = row * TILE + TILE / 2;
-        g.fillStyle(color, 1);
-        g.fillCircle(cx - 3, cy, 3);
-        g.fillCircle(cx + 3, cy, 3);
-        g.fillCircle(cx, cy - 3, 3);
-        g.fillCircle(cx, cy + 3, 3);
-        g.fillStyle(0xffffff, 0.9);
-        g.fillCircle(cx, cy, 2);
+        this.createSwayingFlower(cx, cy, color);
       });
+    }
+
+    // 줄기는 고정, 잎(캐노피)만 별도 컨테이너에 넣어 바람에 살짝 흔들리게 한다
+    createSwayingTree(cx, cy) {
+      const trunk = this.add.graphics();
+      trunk.fillStyle(COLORS.treeTrunk, 1);
+      trunk.fillRect(cx - 4, cy + 2, 8, 12);
+
+      const canopy = this.add.container(cx, cy - 6);
+      const leaves = this.add.graphics();
+      leaves.fillStyle(COLORS.treeLeaf, 1);
+      leaves.fillCircle(0, 0, 14);
+      leaves.fillStyle(COLORS.treeLeafLight, 1);
+      leaves.fillCircle(-4, -4, 8);
+      canopy.add(leaves);
+
+      this.tweens.add({
+        targets: canopy,
+        angle: { from: -3, to: 3 },
+        duration: Phaser.Math.Between(2400, 3400),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+        delay: Phaser.Math.Between(0, 1000),
+      });
+
+      // 줄기 부분만 막아서 발이 걸리는 느낌을 자연스럽게 한다
+      this.createObstacle(cx, cy + 8, 16, 18);
+    }
+
+    // 꽃 전체를 컨테이너로 묶어 바람에 흔들리는 듯한 회전 애니메이션을 준다
+    createSwayingFlower(cx, cy, color, scale = 1) {
+      const container = this.add.container(cx, cy).setScale(scale);
+      const g = this.add.graphics();
+      g.fillStyle(color, 1);
+      g.fillCircle(-3, 0, 3);
+      g.fillCircle(3, 0, 3);
+      g.fillCircle(0, -3, 3);
+      g.fillCircle(0, 3, 3);
+      g.fillStyle(0xffffff, 0.9);
+      g.fillCircle(0, 0, 2);
+      container.add(g);
+
+      this.tweens.add({
+        targets: container,
+        angle: { from: -8, to: 8 },
+        duration: Phaser.Math.Between(1600, 2400),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+        delay: Phaser.Math.Between(0, 800),
+      });
+
+      return container;
     }
 
     // 벤치 (충돌 있음)
@@ -322,6 +379,373 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       g.fillRect(sx + 40, y - 5, 5, 40);
 
       this.createObstacle(sx, y + 14, 80, 30);
+    }
+
+    // 작은 화단 (충돌 있음, 안에는 흔들리는 꽃 몇 송이)
+    drawFlowerBeds(offsetX = 0) {
+      const bedSpots = [
+        [2, 9],
+        [21, 9],
+      ];
+      bedSpots.forEach(([col, row]) =>
+        this.createFlowerBed(offsetX + col * TILE + TILE / 2, row * TILE + TILE / 2)
+      );
+    }
+
+    createFlowerBed(cx, cy) {
+      const w = 56;
+      const h = 30;
+      const g = this.add.graphics();
+
+      g.fillStyle(0x000000, 0.18);
+      g.fillEllipse(cx, cy + h / 2 + 2, w + 6, 10);
+
+      g.fillStyle(COLORS.bedSoil, 1);
+      g.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, 6);
+      g.lineStyle(3, COLORS.bedBorder, 1);
+      g.strokeRoundedRect(cx - w / 2, cy - h / 2, w, h, 6);
+
+      const colors = [COLORS.flowerPink, COLORS.flowerYellow, COLORS.flowerPink, COLORS.flowerYellow];
+      const positions = [
+        [cx - w / 2 + 12, cy],
+        [cx - w / 2 + 26, cy - 6],
+        [cx + w / 2 - 26, cy - 4],
+        [cx + w / 2 - 12, cy + 5],
+      ];
+      positions.forEach(([fx, fy], i) =>
+        this.createSwayingFlower(fx, fy, colors[i % colors.length], 0.7)
+      );
+
+      this.createObstacle(cx, cy, w, h);
+    }
+
+    // 가로등 (충돌 있음, 따뜻한 빛이 은은하게 깜빡인다)
+    drawStreetLamps(offsetX = 0) {
+      const lampSpots = [
+        [9, 1],
+        [15, 1],
+      ];
+      lampSpots.forEach(([col, row]) =>
+        this.createStreetLamp(offsetX + col * TILE + TILE / 2, row * TILE + TILE / 2)
+      );
+    }
+
+    createStreetLamp(cx, cy) {
+      const glow = this.add.circle(cx, cy - 24, 22, COLORS.lampGlow, 0.16);
+      this.tweens.add({
+        targets: glow,
+        alpha: { from: 0.1, to: 0.26 },
+        duration: Phaser.Math.Between(1800, 2600),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+
+      const g = this.add.graphics();
+      g.fillStyle(0x000000, 0.2);
+      g.fillEllipse(cx, cy + 24, 16, 6);
+      g.fillStyle(COLORS.lampPole, 1);
+      g.fillRect(cx - 2, cy - 22, 4, 46);
+      g.fillCircle(cx, cy - 22, 3);
+      g.fillStyle(0x3a3a3a, 1);
+      g.fillRoundedRect(cx - 9, cy - 36, 18, 16, 4);
+      g.fillStyle(COLORS.lampGlow, 1);
+      g.fillCircle(cx, cy - 28, 6);
+
+      this.createObstacle(cx, cy + 22, 8, 16);
+    }
+
+    // 화면마다 분수대를 하나씩 배치하고, 근접 판정을 위해 좌표를 등록한다
+    createFountainForScreen(offsetX = 0) {
+      const cx = offsetX + 12 * TILE + TILE / 2;
+      const cy = 1 * TILE + TILE / 2 + 10;
+      this.createFountainAt(cx, cy);
+      this.fountains.push({ cx, cy });
+    }
+
+    // 물이 솟아오르고 수면이 반짝이는 분수대 (충돌 있음)
+    createFountainAt(cx, cy) {
+      const container = this.add.container(cx, cy);
+
+      const shadow = this.add.graphics();
+      shadow.fillStyle(0x000000, 0.2);
+      shadow.fillEllipse(0, 28, 70, 16);
+      container.add(shadow);
+
+      const base = this.add.graphics();
+      base.fillStyle(COLORS.fountainBase, 1);
+      base.fillEllipse(0, 16, 64, 26);
+      base.fillStyle(COLORS.fountainWater, 1);
+      base.fillEllipse(0, 14, 48, 18);
+      base.fillStyle(COLORS.fountainBase, 1);
+      base.fillRect(-6, -8, 12, 24);
+      base.fillEllipse(0, -10, 26, 12);
+      base.fillStyle(COLORS.fountainWater, 1);
+      base.fillEllipse(0, -10, 16, 7);
+      container.add(base);
+
+      // 수면 반짝임 (펄스)
+      const sparkle = this.add.circle(0, 14, 18, 0xffffff, 0.18);
+      container.add(sparkle);
+      this.tweens.add({
+        targets: sparkle,
+        alpha: { from: 0.08, to: 0.3 },
+        scale: { from: 0.9, to: 1.1 },
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+
+      // 위로 솟았다가 떨어지는 물방울들
+      for (let i = 0; i < 4; i++) {
+        const drop = this.add.circle(Phaser.Math.Between(-4, 4), -8, 2, 0xeaf6ff, 0.9);
+        container.add(drop);
+        this.tweens.add({
+          targets: drop,
+          y: { from: -8, to: -28 },
+          alpha: { from: 0.9, to: 0.05 },
+          duration: Phaser.Math.Between(700, 1000),
+          delay: i * 180,
+          repeat: -1,
+          ease: "Sine.easeOut",
+        });
+      }
+
+      this.createObstacle(cx, cy + 10, 56, 30);
+
+      return container;
+    }
+
+    // 화면마다 산책하는 강아지를 한 마리씩 배치한다
+    createDogForScreen(offsetX = 0) {
+      const x = offsetX + 9 * TILE;
+      const y = 13 * TILE + 16;
+      this.dogs.push(this.createDogAt(x, y, 60));
+    }
+
+    // 좌우로 산책하는 강아지. 플레이어가 근처에 오면 꼬리를 신나게 흔든다
+    createDogAt(x, y, range = 60) {
+      const container = this.add.container(x, y);
+
+      const shadow = this.add.graphics();
+      shadow.fillStyle(0x000000, 0.2);
+      shadow.fillEllipse(0, 10, 22, 7);
+      container.add(shadow);
+
+      const body = this.add.graphics();
+      body.fillStyle(COLORS.dogBody, 1);
+      body.fillRoundedRect(-12, -6, 24, 12, 5);
+      body.fillCircle(10, -8, 7);
+      body.fillStyle(COLORS.dogDark, 1);
+      body.fillTriangle(6, -14, 12, -18, 9, -10);
+      body.fillTriangle(13, -14, 17, -16, 14, -9);
+      body.fillStyle(0x2b1d12, 1);
+      body.fillCircle(13, -9, 1.2);
+      body.fillStyle(0x111111, 1);
+      body.fillRect(-12, 4, 5, 6);
+      body.fillRect(-2, 4, 5, 6);
+      body.fillRect(6, 4, 5, 6);
+      container.add(body);
+
+      const tail = this.add.container(-12, -2);
+      const tailG = this.add.graphics();
+      tailG.fillStyle(COLORS.dogBody, 1);
+      tailG.fillRoundedRect(-2, -8, 5, 10, 2);
+      tail.add(tailG);
+      container.add(tail);
+
+      container.tail = tail;
+      container.baseX = x;
+      container.range = range;
+      container.direction = 1;
+      container.speed = 24;
+      container.isWagging = false;
+      container.tailTween = this.tweens.add({
+        targets: tail,
+        angle: { from: -6, to: 6 },
+        duration: 900,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+
+      return container;
+    }
+
+    // 강아지가 정해진 범위 안에서 좌우로 걸어다니게 한다
+    updateDogMovement(dog, delta) {
+      dog.x += dog.direction * dog.speed * (delta / 1000);
+      if (dog.x > dog.baseX + dog.range) dog.direction = -1;
+      else if (dog.x < dog.baseX - dog.range) dog.direction = 1;
+      dog.setScale(dog.direction, 1);
+    }
+
+    // 플레이어가 강아지 근처에 오면 꼬리를 빠르게 흔들고, 멀어지면 다시 느긋해진다
+    updateDogTailProximity(dog) {
+      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, dog.x, dog.y);
+      const near = dist < 70;
+      if (near === dog.isWagging) return;
+
+      dog.isWagging = near;
+      if (dog.tailTween) dog.tailTween.stop();
+      dog.tailTween = this.tweens.add({
+        targets: dog.tail,
+        angle: near ? { from: -25, to: 25 } : { from: -6, to: 6 },
+        duration: near ? 140 : 900,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+    }
+
+    // 하늘을 가로지르는 새 한 마리. 도착하면 잠시 쉬었다가 다시 날아온다
+    createBird() {
+      const bird = this.add.container(-60, 60).setDepth(50).setVisible(false);
+      const g = this.add.graphics();
+      g.fillStyle(0x2c2c2c, 1);
+      g.fillTriangle(-8, 2, 0, -4, 0, 2);
+      g.fillTriangle(8, 2, 0, -4, 0, 2);
+      bird.add(g);
+      this.bird = bird;
+      this.flyBirdAcross();
+    }
+
+    flyBirdAcross() {
+      const startY = Phaser.Math.Between(40, 90);
+      this.bird.setPosition(-60, startY);
+      this.bird.setScale(1, 1);
+      this.bird.setVisible(true);
+
+      const flap = this.tweens.add({
+        targets: this.bird,
+        scaleY: { from: 1, to: 0.45 },
+        duration: 220,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+
+      this.tweens.add({
+        targets: this.bird,
+        x: WORLD_W + 60,
+        y: startY + Phaser.Math.Between(-20, 20),
+        duration: Phaser.Math.Between(16000, 22000),
+        ease: "Sine.easeInOut",
+        onComplete: () => {
+          flap.stop();
+          this.bird.setVisible(false);
+          this.time.delayedCall(Phaser.Math.Between(9000, 20000), () => this.flyBirdAcross());
+        },
+      });
+    }
+
+    // 화면 곳곳에 떠다니는 벚꽃잎. 적은 개수로 가볍게 흩날리는 느낌만 낸다
+    createCherryBlossoms() {
+      this.petals = [];
+      const count = 16;
+      for (let i = 0; i < count; i++) {
+        const petal = this.add.graphics().setDepth(45);
+        petal.fillStyle(i % 2 === 0 ? 0xffc2d1 : 0xffd9e2, 0.85);
+        petal.fillEllipse(0, 0, 6, 4);
+        petal.x = Phaser.Math.Between(0, WORLD_W);
+        petal.y = Phaser.Math.Between(-WORLD_H, WORLD_H);
+        petal.speed = Phaser.Math.FloatBetween(16, 28);
+        petal.sway = Phaser.Math.FloatBetween(6, 14);
+        petal.seed = Phaser.Math.FloatBetween(0, Math.PI * 2);
+        this.petals.push(petal);
+      }
+    }
+
+    updatePetals(time, delta) {
+      const dt = delta / 1000;
+      this.petals.forEach((petal) => {
+        petal.y += petal.speed * dt;
+        petal.x += Math.sin(time / 1000 + petal.seed) * petal.sway * dt;
+        petal.angle += dt * 30;
+        if (petal.y > WORLD_H + 10) {
+          petal.y = -10;
+          petal.x = Phaser.Math.Between(0, WORLD_W);
+        }
+      });
+    }
+
+    // 분수 근처에 다가가면 물소리를 표현하는 작은 말풍선 아이콘을 띄운다
+    createFountainSoundIcon() {
+      const label = this.add.text(0, 0, "♪ 물소리", {
+        fontFamily: "monospace",
+        fontSize: "11px",
+        color: "#eaf6ff",
+      });
+      this.fountainSoundIcon = this.createRoundedCallout(label, {
+        fillColor: 0x355c7d,
+        borderColor: 0xeaf6ff,
+        padX: 8,
+        padY: 6,
+      })
+        .setDepth(35)
+        .setVisible(false);
+    }
+
+    updateFountainProximity() {
+      let nearest = null;
+      let nearestDist = 90;
+      this.fountains.forEach((f) => {
+        const d = Phaser.Math.Distance.Between(this.player.x, this.player.y, f.cx, f.cy);
+        if (d < nearestDist) {
+          nearestDist = d;
+          nearest = f;
+        }
+      });
+
+      if (nearest) {
+        this.fountainSoundIcon.setPosition(nearest.cx, nearest.cy - 50);
+        this.fountainSoundIcon.setVisible(true);
+      } else {
+        this.fountainSoundIcon.setVisible(false);
+      }
+    }
+
+    // Projects 구역 근처에 다가가면 표시되는 반짝임 효과
+    createProjectsSparkle() {
+      this.projectsSparkle = this.add.container(0, 0).setDepth(40).setVisible(false);
+      this.sparkleDots = [];
+      for (let i = 0; i < 6; i++) {
+        const dot = this.add.star(0, 0, 4, 2, 5, COLORS.lampGlow, 0.9).setScale(0.4);
+        this.projectsSparkle.add(dot);
+        this.sparkleDots.push(dot);
+        this.tweens.add({
+          targets: dot,
+          alpha: { from: 0.2, to: 1 },
+          scale: { from: 0.3, to: 0.7 },
+          duration: Phaser.Math.Between(500, 900),
+          yoyo: true,
+          repeat: -1,
+          delay: i * 120,
+        });
+      }
+    }
+
+    layoutSparkleDots(cx, cy) {
+      const radius = 34;
+      this.sparkleDots.forEach((dot, i) => {
+        const angle = (i / this.sparkleDots.length) * Math.PI * 2;
+        dot.setPosition(Math.cos(angle) * radius, Math.sin(angle) * radius * 0.6 - 10);
+      });
+      this.projectsSparkle.setPosition(cx, cy);
+    }
+
+    // 구역에 들어서면 해당 구역의 글로우가 짧게 "톡" 튀어오르며 반응한다
+    pulseZoneGlow(marker) {
+      if (!marker?.glow) return;
+      this.tweens.add({
+        targets: marker.glow,
+        scaleX: 1.4,
+        scaleY: 1.4,
+        duration: 220,
+        yoyo: true,
+        ease: "Sine.easeOut",
+      });
     }
 
     // 각 zone 위치에 작은 건물/오브젝트 아이콘을 그린다
@@ -1037,6 +1461,24 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
         }
       }
 
+      // 강아지 산책 + 꼬리 흔들기 상호작용
+      if (this.dogs) {
+        this.dogs.forEach((dog) => {
+          this.updateDogMovement(dog, delta);
+          this.updateDogTailProximity(dog);
+        });
+      }
+
+      // 분수 근처 물소리 아이콘
+      if (this.fountains) {
+        this.updateFountainProximity();
+      }
+
+      // 떠다니는 벚꽃잎
+      if (this.petals) {
+        this.updatePetals(time, delta);
+      }
+
       // 가장 가까운 zone 체크
       let nearestZone = null;
       let nearestMarker = null;
@@ -1062,7 +1504,18 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       if (nearestZone !== this.activeZone) {
         if (this.activeZone && onZoneExit) onZoneExit(this.activeZone);
         if (nearestZone && onZoneEnter) onZoneEnter(nearestZone);
+        if (nearestZone && nearestMarker) this.pulseZoneGlow(nearestMarker);
         this.activeZone = nearestZone;
+      }
+
+      // Projects 구역 근처 반짝임 효과
+      if (this.projectsSparkle) {
+        if (nearestZone === "projects" && nearestMarker) {
+          this.layoutSparkleDots(nearestMarker.cx, nearestMarker.cy);
+          this.projectsSparkle.setVisible(true);
+        } else {
+          this.projectsSparkle.setVisible(false);
+        }
       }
 
       this.updateCompass();

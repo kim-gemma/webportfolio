@@ -27,12 +27,20 @@ export const PORTFOLIO_DATA = {
 
   skills: [
     {
-      id: "react-native",
-      name: "React Native",
-      category: "Mobile",
+      id: "react",
+      name: "React",
+      category: "Frontend",
+      level: 4,
+      description:
+        "React 기반 컴포넌트 설계와 상태 관리 경험을 보유하고 있으며, 재사용 가능한 UI 컴포넌트 구조와 유지보수성을 고려한 화면 개발을 수행했습니다. useState, useEffect, Custom Hook을 활용하여 비즈니스 로직과 UI를 분리했습니다.",
+    },
+    {
+      id: "javascript",
+      name: "JavaScript",
+      category: "Language",
       level: 5,
       description:
-        "엔터프라이즈 앱을 3년 이상 운영하며 재사용성과 확장성을 고려한 계층적 컴포넌트 구조화, UI와 상태 변경 로직 분리로 유지보수성을 높였습니다.",
+        "ES6+ 문법을 기반으로 비동기 처리(Promise, async/await), 이벤트 처리, DOM 조작 및 데이터 가공 로직을 구현했습니다. 클로저, 스코프, 이벤트 루프 등 JavaScript 핵심 개념을 이해하고 있습니다.",
     },
     {
       id: "typescript",
@@ -40,15 +48,15 @@ export const PORTFOLIO_DATA = {
       category: "Language",
       level: 4,
       description:
-        "React Native 기반 엔터프라이즈 앱 개발 전반에 적용해 타입 안정성을 확보하고 협업 시 인터페이스 오류를 줄였습니다.",
+        "정적 타입 시스템을 활용하여 런타임 오류를 줄이고 대규모 프로젝트의 유지보수성과 협업 효율을 높였습니다.",
     },
     {
-      id: "webview-bridge",
-      name: "WebView-Native Bridge",
+      id: "react-native",
+      name: "React Native",
       category: "Mobile",
       level: 5,
       description:
-        "메시지 프로토콜을 정의해 WebView와 Native 모듈 간 안정적인 양방향 통신을 구현하고, Android/iOS 플랫폼별 이슈를 해결했습니다.",
+        "3년 이상 엔터프라이즈 모바일 앱을 개발하며 플랫폼 특성을 고려한 UI 구현 및 성능 최적화를 경험했습니다.",
     },
     {
       id: "state-api",
@@ -56,7 +64,23 @@ export const PORTFOLIO_DATA = {
       category: "Architecture",
       level: 4,
       description:
-        "Context API, Redux, Zustand를 상황에 맞게 활용해 전역/지역 상태를 분리하고, REST/WebSocket 기반 실시간 데이터 통신을 설계했습니다.",
+        "Context API, Redux, Zustand를 프로젝트 규모에 맞게 활용하여 전역 상태와 지역 상태를 효율적으로 관리했습니다.",
+    },
+    {
+      id: "rest-websocket",
+      name: "REST API & WebSocket",
+      category: "Communication",
+      level: 4,
+      description:
+        "REST API 기반 CRUD 기능 개발과 WebSocket을 활용한 실시간 데이터 통신 기능을 구현했습니다. 프론트엔드와 백엔드 간 데이터 흐름을 설계하고 관리했습니다.",
+    },
+    {
+      id: "webview-bridge",
+      name: "WebView-Native Bridge",
+      category: "Mobile",
+      level: 5,
+      description:
+        "WebView와 Native 모듈 간 양방향 통신을 구현하여 Android/iOS 플랫폼별 이슈를 해결했습니다.",
     },
     {
       id: "ai-integration",
@@ -64,15 +88,15 @@ export const PORTFOLIO_DATA = {
       category: "Feature",
       level: 4,
       description:
-        "AI Chat UI 설계와 STT 연동, 실시간 스트리밍 응답 처리를 구현했습니다. STT 상태를 Custom Hook으로 분리해 UI 충돌을 제거했습니다.",
+        "AI Chat UI, STT, OCR, 스트리밍 응답 처리 등 생성형 AI 기반 기능을 프론트엔드에 통합했습니다.",
     },
     {
       id: "backend-cloud",
-      name: "Backend & Cloud (학습 중)",
+      name: "Backend & Cloud",
       category: "Backend",
       level: 2,
       description:
-        "Spring Boot 기반 REST API, MySQL 데이터베이스 설계, Docker 컨테이너 환경 구축과 AWS 배포까지 서비스 전체 구조를 이해하기 위해 학습하고 있습니다.",
+        "Spring Boot, MySQL, Docker, AWS 환경을 학습하며 프론트엔드 개발자가 이해해야 할 서버 구조와 배포 과정을 경험했습니다.",
     },
   ],
 
@@ -197,7 +221,7 @@ export const PORTFOLIO_DATA = {
     links: [
       { label: "GitHub", url: "https://github.com/kim-gemma" },
       {
-        label: "Notion Portfolio",
+        label: "Notion",
         url: "https://app.notion.com/p/Home-37a1b4452a5380b19bfde40e5c19b7db",
       },
     ],
