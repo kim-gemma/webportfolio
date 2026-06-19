@@ -7,7 +7,7 @@ export const ZONE_META = {
   about: {
     key: "about",
     title: "About Me",
-    icon: "🏠",
+    icon: "🙂",
     description: "소개",
     color: "#b5563a",
   },
@@ -35,7 +35,7 @@ export const ZONE_META = {
   contact: {
     key: "contact",
     title: "Contact",
-    icon: "📮",
+    icon: "🤙",
     description: "연락",
     color: "#4a78a0",
   },

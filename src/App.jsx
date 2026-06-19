@@ -7,10 +7,21 @@ import ZoneHint from "./components/ZoneHint";
 import FooterHint from "./components/FooterHint";
 import VirtualJoystick from "./components/VirtualJoystick";
 import ZoneModal from "./components/ZoneModal";
+import MailboxModal from "./components/MailboxModal";
+import MailboxHint from "./components/MailboxHint";
 
 function GameContent() {
   const gameContainerRef = useRef(null);
-  const { activeZone, closeZone, isMobile, setIsMobile, currentScene, openZone } = useGame();
+  const {
+    activeZone,
+    closeZone,
+    isMobile,
+    setIsMobile,
+    currentScene,
+    openZone,
+    mailboxModalOpen,
+    closeMailboxModal,
+  } = useGame();
 
   // 게임 인스턴스 초기화
   usePhaserGame(gameContainerRef);
@@ -38,14 +49,17 @@ function GameContent() {
   // Escape 키로 모달 닫기
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.code === "Escape" && activeZone) {
+      if (e.code !== "Escape") return;
+      if (mailboxModalOpen) {
+        closeMailboxModal();
+      } else if (activeZone) {
         closeZone();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeZone, closeZone]);
+  }, [activeZone, closeZone, mailboxModalOpen, closeMailboxModal]);
 
   const handleJoystick = useCallback((x, y) => {
     if (currentScene) {
@@ -53,25 +67,29 @@ function GameContent() {
     }
   }, [currentScene]);
 
-  const handleTopBarSelect = useCallback((key) => {
-    if (key === "home") {
-      closeZone();
-      if (currentScene?.movePlayerHome) {
-        currentScene.movePlayerHome();
-      }
-      return;
-    }
+  // GardenScene이 준비된 시점(PLAY로 두 번째 화면에 진입한 시점)부터 TopBar를 보여준다
+  const gameStarted = Boolean(currentScene);
 
-    openZone(key);
-  }, [currentScene, closeZone, openZone]);
+  const handleHomeSelect = useCallback(() => {
+    const alreadyHome =
+      !activeZone && !mailboxModalOpen && (currentScene?.isAtHome?.() ?? true);
+    if (alreadyHome) return;
+
+    closeZone();
+    closeMailboxModal();
+    currentScene?.movePlayerHome?.();
+  }, [activeZone, mailboxModalOpen, currentScene, closeZone, closeMailboxModal]);
 
   return (
     <div className="app-shell">
-      <TopBar onZoneSelect={handleTopBarSelect} />
+      {gameStarted && (
+        <TopBar onHomeSelect={handleHomeSelect} onZoneSelect={openZone} />
+      )}
 
       <div className="game-stage" ref={gameContainerRef}>
         {/* 게임 캔버스가 렌더링되는 영역 */}
         {/* ZoneHint는 게임 위에 오버레이됨 */}
+        <MailboxHint isMobile={isMobile} />
       </div>
 
       {isMobile && <VirtualJoystick onMove={handleJoystick} />}
@@ -79,6 +97,8 @@ function GameContent() {
       {activeZone && (
         <ZoneModal zoneKey={activeZone} onClose={closeZone} />
       )}
+
+      {mailboxModalOpen && <MailboxModal onClose={closeMailboxModal} />}
 
       <FooterHint isMobile={isMobile} />
     </div>

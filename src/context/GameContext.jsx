@@ -8,6 +8,8 @@ export function GameProvider({ children }) {
   const [gameInstance, setGameInstance] = useState(null);
   const [currentScene, setCurrentScene] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [mailboxNear, setMailboxNear] = useState(false);
+  const [mailboxModalOpen, setMailboxModalOpen] = useState(false);
 
   const openZone = useCallback((zoneKey) => {
     setActiveZone(zoneKey);
@@ -29,17 +31,39 @@ export function GameProvider({ children }) {
     setCurrentScene(scene);
   }, []);
 
+  const onMailboxEnter = useCallback(() => {
+    setMailboxNear(true);
+  }, []);
+
+  const onMailboxExit = useCallback(() => {
+    setMailboxNear(false);
+  }, []);
+
+  const openMailboxModal = useCallback(() => {
+    setMailboxModalOpen(true);
+  }, []);
+
+  const closeMailboxModal = useCallback(() => {
+    setMailboxModalOpen(false);
+  }, []);
+
   const value = {
     activeZone,
     hintZone,
     gameInstance,
     currentScene,
     isMobile,
+    mailboxNear,
+    mailboxModalOpen,
     openZone,
     closeZone,
     onZoneEnter,
     onZoneExit,
     onSceneReady,
+    onMailboxEnter,
+    onMailboxExit,
+    openMailboxModal,
+    closeMailboxModal,
     setGameInstance,
     setIsMobile,
   };

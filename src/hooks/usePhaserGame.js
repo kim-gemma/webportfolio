@@ -6,15 +6,24 @@ import { useGame } from "../context/GameContext";
 
 export function usePhaserGame(containerRef) {
   const gameRef = useRef(null);
-  const { setGameInstance, onZoneEnter, onZoneExit, onSceneReady } = useGame();
+  const {
+    setGameInstance,
+    onZoneEnter,
+    onZoneExit,
+    onSceneReady,
+    onMailboxEnter,
+    onMailboxExit,
+  } = useGame();
 
   const GardenScene = useCallback(() => {
     return createGardenScene({
       onZoneEnter,
       onZoneExit,
       onReady: onSceneReady,
+      onMailboxEnter,
+      onMailboxExit,
     });
-  }, [onZoneEnter, onZoneExit, onSceneReady]);
+  }, [onZoneEnter, onZoneExit, onSceneReady, onMailboxEnter, onMailboxExit]);
 
   useEffect(() => {
     if (!containerRef?.current || gameRef.current) {

@@ -167,6 +167,7 @@ a:hover {
 }
 
 .top-bar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -175,7 +176,8 @@ a:hover {
   background: rgba(37, 43, 61, 0.78);
   backdrop-filter: blur(6px);
   border-bottom: 2px solid var(--color-border);
-  z-index: 10;
+  /* 모달 오버레이(z-index: 50)보다 위에 있어야 Home 버튼으로 항상 모달을 닫을 수 있다 */
+  z-index: 60;
 }
 
 .top-bar-name {
@@ -223,17 +225,176 @@ a:hover {
   font-size: 13px;
   line-height: 1;
 }
+.top-bar-name {
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease;
+  user-select: none;
+}
+
+.top-bar-name:hover {
+  transform: scale(1.05);
+  color: #ff9f43;
+}
+
+.top-bar-name:active {
+  transform: scale(0.98);
+}
+
+.top-bar-name:focus {
+  outline: 2px solid #ff9f43;
+  outline-offset: 4px;
+}
+
+@media (max-width: 768px) {
+  .top-bar-name {
+    padding: 4px 8px;
+  }
+}
 
 @media (max-width: 480px) {
   .top-bar {
     padding: 10px 12px;
   }
-  .top-bar-link {
+  .top-bar-nav-desktop .top-bar-link {
     padding: 6px 8px;
     font-size: 0;
   }
-  .top-bar-link-icon {
+  .top-bar-nav-desktop .top-bar-link-icon {
     font-size: 16px;
+  }
+}
+
+/* ------------------------------------------------------------
+   TopBar: PC 가로 메뉴 ↔ 모바일 햄버거 메뉴 전환 (기준 768px)
+   ------------------------------------------------------------ */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.hamburger-btn:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.mobile-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.55);
+  border: none;
+  padding: 0;
+  z-index: 9;
+  animation: fadeIn 0.15s ease;
+}
+
+.mobile-menu-panel {
+  position: absolute;
+  top: 100%;
+  right: 12px;
+  left: 12px;
+  z-index: 11;
+  background: var(--color-panel);
+  border: 2px solid var(--color-border);
+  border-top: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: modalRise 0.18s ease;
+}
+
+.mobile-menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-menu-link {
+  width: 100%;
+  font-size: 14px;
+  padding: 12px 14px;
+  justify-content: flex-start;
+}
+
+.mobile-menu-downloads {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border);
+}
+
+/* ------------------------------------------------------------
+   상단 메뉴: 이력서 / 포트폴리오 다운로드
+   ------------------------------------------------------------ */
+.top-bar-downloads {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: transform 0.08s ease, background 0.15s, border-color 0.15s;
+}
+.download-btn:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+.download-btn.is-pressed {
+  transform: scale(0.92);
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+.download-btn-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+.download-btn-pdf {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.download-btn-large {
+  width: 100%;
+  justify-content: center;
+  padding: 14px 18px;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+}
+.download-btn-large .download-btn-icon {
+  font-size: 18px;
+}
+
+@media (max-width: 480px) {
+  .top-bar-downloads-desktop .download-btn {
+    padding: 6px 8px;
+    font-size: 0;
+    gap: 0;
+  }
+  .top-bar-downloads-desktop .download-btn-icon {
+    font-size: 16px;
+  }
+  .top-bar-downloads-desktop .download-btn-pdf {
+    display: none;
   }
 }
 
@@ -281,6 +442,20 @@ a:hover {
 @keyframes bob {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -6px); }
+}
+
+.mailbox-hint {
+  border-color: #4a78a0;
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--color-text);
+}
+.mailbox-hint .zone-hint-key {
+  background: #4a78a0;
+}
+.mailbox-hint:hover {
+  background: var(--color-panel-raised);
 }
 
 .footer-hint {
@@ -592,6 +767,28 @@ a:hover {
   padding: 10px 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
+}
+
+/* Mailbox modal */
+.mailbox-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ------------------------------------------------------------
+   TopBar 반응형 전환 (기준 768px). 다른 .top-bar-* 규칙들보다
+   뒤에 위치시켜 동일 우선순위에서도 항상 이 규칙이 이기게 한다.
+   ------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .top-bar-nav-desktop,
+  .top-bar-downloads-desktop {
+    display: none;
+  }
+  .hamburger-btn {
+    display: flex;
+  }
 }
 
 /* ------------------------------------------------------------

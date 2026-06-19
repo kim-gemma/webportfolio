@@ -4,7 +4,7 @@ export default function ContactContent() {
   const { contact } = PORTFOLIO_DATA;
   return (
     <div className="modal-body">
-      <div className="modal-eyebrow">📮 Contact</div>
+      <div className="modal-eyebrow">🤙 Contact</div>
       <h2 className="modal-title">연락하기</h2>
       <p className="modal-paragraph">{contact.message}</p>
       <a href={`mailto:${contact.email}`} className="contact-email">

@@ -95,7 +95,17 @@ const GREETINGS = [
   "구역들을 둘러보세요!",
 ];
 
-export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
+// 우체통(이력서/포트폴리오 다운로드) 오브젝트 위치: 중앙 화면의 빈 잔디 공간
+const MAILBOX_TILE = { x: 16, y: 10 };
+const MAILBOX_RADIUS = TILE * 1.3;
+
+export function createGardenScene({
+  onZoneEnter,
+  onZoneExit,
+  onReady,
+  onMailboxEnter,
+  onMailboxExit,
+}) {
   class GardenScene extends Phaser.Scene {
     constructor() {
       super("GardenScene");
@@ -106,6 +116,7 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       this.joystickVector = { x: 0, y: 0 };
       this.currentMapIndex = 0;
       this.screenWidth = TILE * MAP_COLS;
+      this.isNearMailbox = false;
     }
 
     preload() {
@@ -152,10 +163,12 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       this.createCherryBlossoms();
       this.createFountainSoundIcon();
       this.createProjectsSparkle();
+      this.createMailbox();
       this.createPlayer();
       this.createCompass();
       this.createInteractPrompt();
       this.createZoneEnterPrompt();
+      this.createMailboxEnterPrompt();
       this.createPlayerGuideBubble();
       this.setupCollisions();
 
@@ -748,6 +761,98 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
       });
     }
 
+    // 이력서/포트폴리오 다운로드용 픽셀아트 우체통(📮). 중앙 화면의 빈 잔디 공간에
+    // 하나만 배치하며, 플레이어가 근처에서 Enter를 누르면 React 쪽 다운로드 모달이 열린다.
+    createMailbox() {
+      const centerScreenOffsetX = TILE * MAP_COLS;
+      const cx = centerScreenOffsetX + MAILBOX_TILE.x * TILE + TILE / 2;
+      const cy = MAILBOX_TILE.y * TILE + TILE / 2;
+      this.mailbox = { cx, cy };
+
+      const g = this.add.graphics();
+
+      // 바닥 그림자
+      g.fillStyle(0x000000, 0.25);
+      g.fillEllipse(cx, cy + 20, 34, 12);
+
+      // 받침대(기둥)
+      g.fillStyle(COLORS.signpost, 1);
+      g.fillRect(cx - 3, cy, 6, 22);
+
+      // 우체통 몸체
+      g.fillStyle(0xb5563a, 1);
+      g.fillRoundedRect(cx - 14, cy - 26, 28, 26, 8);
+      g.fillStyle(0x9a4730, 1);
+      g.fillRect(cx - 14, cy - 6, 28, 5);
+
+      // 투입구
+      g.fillStyle(0x1a1f2e, 1);
+      g.fillRoundedRect(cx - 8, cy - 19, 16, 5, 2);
+
+      // 깃발
+      g.fillStyle(0xf4d35e, 1);
+      g.fillTriangle(cx + 14, cy - 24, cx + 24, cy - 20, cx + 14, cy - 16);
+
+      // 이모지 라벨 (요구사항: 📮 픽셀아트 오브젝트)
+      // this.add.text(cx, cy - 46, "📮", { fontSize: "20px" }).setOrigin(0.5);
+
+      const nameLabel = this.add
+        .text(cx, cy + 32, "Mailbox", {
+          fontFamily: "monospace",
+          fontSize: "11px",
+          color: "#f0ebe1",
+          backgroundColor: "#1a1f2eaa",
+          padding: { x: 6, y: 3 },
+        })
+        .setOrigin(0.5);
+      this.mailbox.label = nameLabel;
+
+      // 살짝 떠 있는 듯한 펄스 글로우로 시선을 끈다
+      const glow = this.add.circle(cx, cy - 8, MAILBOX_RADIUS, 0x4a78a0, 0.08);
+      glow.setStrokeStyle(2, 0x4a78a0, 0.35);
+      this.tweens.add({
+        targets: glow,
+        alpha: { from: 0.06, to: 0.18 },
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+      });
+      this.mailbox.glow = glow;
+
+      // 우체통 본체만 막아서 플레이어가 통과하지 못하게 한다
+      this.createObstacle(cx, cy - 4, 28, 30);
+    }
+
+    // 플레이어와 우체통 사이 거리를 매 프레임 확인해 안내 말풍선과
+    // React 쪽 근접 상태(onMailboxEnter/onMailboxExit)를 갱신한다
+    updateMailboxProximity() {
+      if (!this.mailbox) return;
+      const dist = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        this.mailbox.cx,
+        this.mailbox.cy
+      );
+      const near = dist < MAILBOX_RADIUS;
+
+      if (near) {
+        this.mailboxEnterPrompt.setPosition(this.mailbox.cx, this.mailbox.cy - 64);
+        this.mailboxEnterPrompt.setVisible(true);
+      } else {
+        this.mailboxEnterPrompt.setVisible(false);
+      }
+
+      if (near !== this.isNearMailbox) {
+        this.isNearMailbox = near;
+        if (near) {
+          this.pulseZoneGlow(this.mailbox);
+          if (onMailboxEnter) onMailboxEnter();
+        } else if (onMailboxExit) {
+          onMailboxExit();
+        }
+      }
+    }
+
     // 각 zone 위치에 작은 건물/오브젝트 아이콘을 그린다
     drawZoneBuildings(offsetX = 0) {
       ZONES.forEach((zone) => {
@@ -1086,11 +1191,18 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
     }
   }
 
+    // Home 버튼/플레이어 스폰이 항상 같은 위치를 가리키도록 한 곳에서 계산한다
+    getHomePosition() {
+      const screenW = TILE * MAP_COLS;
+      return {
+        x: screenW + (MAP_COLS / 2) * TILE,
+        y: (MAP_ROWS / 2) * TILE + TILE * 2,
+      };
+    }
+
     createPlayer() {
       // 중앙 화면(화면 1)의 중앙에 플레이어 배치
-      const screenW = TILE * MAP_COLS;
-      const startX = screenW + (MAP_COLS / 2) * TILE;
-      const startY = (MAP_ROWS / 2) * TILE + TILE * 2;
+      const { x: startX, y: startY } = this.getHomePosition();
 
       const container = this.add.container(startX, startY);
       container.setDepth(10);
@@ -1259,6 +1371,22 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
         .setVisible(false);
     }
 
+    // 우체통 위에 표시할 "Enter 키로 열기" 안내 말풍선 (Zone과 다른 색으로 구분)
+    createMailboxEnterPrompt() {
+      const label = this.add.text(0, 0, "✉️ Enter 키로 우편함 열기", {
+        fontFamily: "monospace",
+        fontSize: "11px",
+        color: "#f0ebe1",
+      });
+
+      this.mailboxEnterPrompt = this.createRoundedCallout(label, {
+        fillColor: 0x4a78a0,
+        borderColor: 0xf0ebe1,
+      })
+        .setDepth(35)
+        .setVisible(false);
+    }
+
     // 게임 시작 시 플레이어 머리 위에 조작 방법 안내 말풍선을 띄운다.
     // 처음 이동 입력이 들어오면 사라지고 이후 다시 표시되지 않는다.
     createPlayerGuideBubble() {
@@ -1388,10 +1516,17 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
     }
 
     movePlayerHome() {
-      const startX = (MAP_COLS / 2) * TILE;
-      const startY = (MAP_ROWS / 2) * TILE + TILE * 2;
+      const { x: startX, y: startY } = this.getHomePosition();
       this.player.setPosition(startX, startY);
       this.cameras.main.centerOn(startX, startY);
+    }
+
+    // Home 버튼이 불필요하게 카메라/플레이어를 다시 이동시키지 않도록,
+    // 이미 홈 위치 근처에 있는지 확인한다
+    isAtHome() {
+      if (!this.player) return true;
+      const { x: startX, y: startY } = this.getHomePosition();
+      return Phaser.Math.Distance.Between(this.player.x, this.player.y, startX, startY) < 4;
     }
 
     setJoystickVector(x, y) {
@@ -1520,6 +1655,7 @@ export function createGardenScene({ onZoneEnter, onZoneExit, onReady }) {
 
       this.updateCompass();
       this.updateInteraction();
+      this.updateMailboxProximity();
     }
 
     // 입장 가능한 구역 근처에 도착하면 그 구역 위에 "Enter 키로 입장" 안내를 띄운다
