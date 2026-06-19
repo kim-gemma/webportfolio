@@ -1,65 +1,131 @@
-# 코드 정원 포트폴리오
+# 🌿 코드 정원 포트폴리오
 
-React + Phaser.js로 만든 게임형 인터랙티브 포트폴리오입니다. 캐릭터가 픽셀아트 정원 맵을 돌아다니며 About / Skills / Experience / Projects / Contact 구역을 발견하는 구조입니다.
+배포 주소
+https://webportfolio-ten-theta.vercel.app/
 
-## 시작하기
+GitHub 저장소
+https://github.com/kim-gemma
+
+## 프로젝트 소개
+
+코드 정원 포트폴리오는 React와 Phaser.js를 활용하여 제작한 게임형 인터랙티브 포트폴리오입니다.
+
+일반적인 웹 포트폴리오에서 벗어나 사용자가 캐릭터를 직접 조작하며 정원 맵을 탐험하고, About / Skills / Experience / Projects / Contact 구역을 발견하는 방식으로 구성했습니다.
+
+포트폴리오를 단순히 읽는 것이 아니라 직접 경험할 수 있도록 설계했으며, 게임적인 요소를 통해 사용자의 몰입감을 높이는 데 집중했습니다.
+
+## 주요 기능
+
+### 🎮 게임형 인터랙션
+
+* Phaser.js 기반 픽셀아트 맵 구현
+* 캐릭터 이동 및 충돌 처리
+* 구역 탐색 기반 정보 확인
+* PC 및 모바일 환경 지원
+
+### 📱 반응형 지원
+
+* 데스크톱 키보드 조작 지원
+* 모바일 가상 조이스틱 지원
+* 다양한 화면 크기 대응
+
+### 📋 포트폴리오 정보 제공
+
+* About
+* Skills
+* Experience
+* Projects
+* Contact
+
+각 영역을 모달 형태로 제공하여 사용자 경험을 개선했습니다.
+
+### 🎨 커스텀 맵 시스템
+
+* Phaser Graphics API 활용
+* 외부 이미지 없이 맵 및 오브젝트 직접 생성
+* 구역별 테마 및 컬러 시스템 적용
+
+## 기술 스택
+
+### Frontend
+
+* React
+* JavaScript
+* Phaser.js
+* CSS3
+
+### Deployment
+
+* Vercel
+
+## 프로젝트 구조
 
 ```bash
-npm install
-npm run dev
-```
-
-브라우저에서 `http://localhost:5173` 으로 접속합니다.
-
-빌드:
-
-```bash
-npm run build
-npm run preview
-```
-
-## 내 정보로 교체하기
-
-모든 텍스트 콘텐츠는 `src/data/portfolioData.js` 한 파일에 모여 있습니다. 이 파일의 값만 수정하면 화면 전체가 업데이트됩니다.
-
-- `profile`: 이름, 직무, 한 줄 소개
-- `about`: 자기소개 문단
-- `skills`: 기술 스택 목록 (level은 1~5)
-- `experience`: 경력 타임라인
-- `projects`: 프로젝트 카드
-- `contact`: 연락처 및 링크
-
-## 구조
-
-```
 src/
-  main.jsx              진입점
-  App.jsx                전체 레이아웃 + Phaser 게임 마운트
-  styles.css             전체 스타일 (디자인 토큰 포함)
-  game/
-    gardenScene.js        Phaser 씬: 맵, 캐릭터, zone 충돌 로직
-  components/
-    IntroScreen.jsx        시작 화면
-    TopBar.jsx              상단 바로가기 네비게이션
-    ZoneHint.jsx            구역 근처 말풍선 힌트
-    VirtualJoystick.jsx     모바일 가상 조이스틱
-    ZoneModal.jsx           구역별 정보 모달 (About/Skills/Experience/Projects/Contact)
-  data/
-    portfolioData.js        모든 텍스트 콘텐츠
+├── components/
+│   ├── TopBar.jsx
+│   ├── ZoneModal.jsx
+│   ├── ZoneHint.jsx
+│   ├── VirtualJoystick.jsx
+│   └── DownloadButton.jsx
+│
+├── game/
+│   ├── introScene.js
+│   └── gardenScene.js
+│
+├── context/
+│   └── GameContext.jsx
+│
+├── config/
+│   └── zonesConfig.js
+│
+├── data/
+│   └── portfolioData.js
+│
+└── utils/
 ```
 
 ## 조작 방법
 
-- PC: WASD 또는 방향키로 이동, 구역 근처에서 Enter로 정보 열기, Esc로 닫기
-- 모바일: 화면 좌하단 가상 조이스틱으로 이동, 구역 진입 시 자동으로 힌트가 뜨고 탭하면 모달이 열림
-- 상단 바의 메뉴를 눌러 바로 이동 없이 각 구역 정보를 열 수도 있습니다
+### PC
 
-## 비주얼 에셋에 대해
+* WASD 이동
+* 방향키 이동
+* Enter : 정보 열기
+* ESC : 모달 닫기
 
-모든 캐릭터, 건물, 맵 타일은 외부 이미지 파일 없이 Phaser의 Graphics API로 코드 안에서 직접 그립니다(`gardenScene.js` 참고). 나중에 실제 스프라이트 이미지(PNG)로 교체하고 싶다면 `preload()`에서 이미지를 로드하고, `drawZoneBuildings()` / `createPlayer()`의 Graphics 호출을 `this.add.sprite(...)` 호출로 바꾸면 됩니다.
+### Mobile
 
-## 커스터마이징 팁
+* 가상 조이스틱 이동
+* 구역 진입 시 힌트 표시
+* 탭하여 상세 정보 확인
 
-- 색상, 폰트 등 디자인 토큰은 `src/styles.css` 상단의 `:root` 변수에 모여 있습니다.
-- 맵 크기나 구역 위치는 `src/game/gardenScene.js`의 `MAP_COLS`, `MAP_ROWS`, `ZONES` 배열에서 조정합니다.
-- 새로운 구역(zone)을 추가하려면 `ZONES` 배열에 항목을 추가하고, `ZoneModal.jsx`에 해당 콘텐츠 컴포넌트를 추가하면 됩니다.
+## 구현 포인트
+
+* React와 Phaser.js 라이프사이클 연동
+* Context API 기반 게임 상태 관리
+* Zone 기반 충돌 감지 시스템
+* 모달 및 UI 컴포넌트 분리
+* 모바일 조이스틱 인터페이스 구현
+* 재사용 가능한 포트폴리오 데이터 구조 설계
+
+## 향후 개선 계획
+
+* 다크 모드 / 라이트 모드 전환
+* NPC 및 상호작용 추가
+* 배경 애니메이션 강화
+* 실시간 채팅 기능(WebSocket)
+* 방문자 방명록 기능
+* 프로젝트 상세 페이지 추가
+
+## 제작자
+
+김현능
+
+React Native · Frontend Engineer
+
+GitHub
+https://github.com/kim-gemma
+
+Portfolio
+https://webportfolio-ten-theta.vercel.app/
