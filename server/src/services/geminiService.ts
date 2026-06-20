@@ -33,6 +33,7 @@ export async function generateNpcReply(history: GeminiChatTurn[]): Promise<strin
   }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${env.geminiModel}:generateContent?key=${env.geminiApiKey}`;
+  console.log(`[geminiService] using model: ${env.geminiModel}`);
 
   let response: Response;
   try {
@@ -46,8 +47,8 @@ export async function generateNpcReply(history: GeminiChatTurn[]): Promise<strin
           parts: [{ text: turn.text }],
         })),
         generationConfig: {
-          maxOutputTokens: 512,
-          temperature: 0.6,
+          maxOutputTokens: 768,
+          temperature: 0.65,
         },
       }),
     });
@@ -67,10 +68,8 @@ export async function generateNpcReply(history: GeminiChatTurn[]): Promise<strin
   const data = (await response.json()) as GeminiGenerateContentResponse;
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-  
   if (!text) {
     throw new Error("Gemini API returned no text in response.");
-    console.log(`Gemini model: ${env.geminiModel}`);
   }
 
   return text.trim();

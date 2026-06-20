@@ -184,6 +184,18 @@ export function createGardenScene({
       this.updateCameraZoom();
       this.scale.on("resize", () => this.updateCameraZoom());
 
+      // 🌙 Pixel Garden Night: 다크모드일 때 맵 자체에 밤 분위기를 적용한다.
+      // index.html의 anti-FOUC 스크립트가 React/Phaser보다 먼저 data-theme을
+      // 설정해두므로, 시작 시점에 바로 현재 테마를 읽어 반영할 수 있다.
+      this.createNightEffects();
+      this.applyThemeVisuals(this.readCurrentTheme(), true);
+
+      this.handleThemeChange = (e) => this.applyThemeVisuals(e.detail);
+      window.addEventListener("themechange", this.handleThemeChange);
+      this.events.once("shutdown", () => {
+        window.removeEventListener("themechange", this.handleThemeChange);
+      });
+
       if (onReady) onReady(this);
     }
 
@@ -826,9 +838,13 @@ export function createGardenScene({
         repeat: -1,
       });
       this.mailbox.glow = glow;
+      this.mailbox.bodyGraphics = g;
 
       // 우체통 본체만 막아서 플레이어가 통과하지 못하게 한다
       this.createObstacle(cx, cy - 4, 28, 30);
+
+      // 마우스 호버 시 살짝 들썩이며 글로우가 밝아지는 반응을 준다 (PC 전용 — 모바일은 터치라 무관)
+      this.addHoverBounce(this.mailbox, cx, cy - 4, 40, 56);
     }
 
     // 플레이어와 우체통 사이 거리를 매 프레임 확인해 안내 말풍선과
@@ -916,9 +932,13 @@ export function createGardenScene({
         repeat: -1,
       });
       this.aiNpc.glow = glow;
+      this.aiNpc.bodyGraphics = g;
 
       // 로봇 본체만 막아서 플레이어가 통과하지 못하게 한다
       this.createObstacle(cx, cy - 4, 26, 38);
+
+      // 마우스 호버 시 살짝 들썩이며 글로우가 밝아지는 반응을 준다
+      this.addHoverBounce(this.aiNpc, cx, cy - 10, 40, 60);
     }
 
     // 플레이어와 AI NPC 사이 거리를 매 프레임 확인해 안내 말풍선과
@@ -948,6 +968,178 @@ export function createGardenScene({
         } else if (onAiNpcExit) {
           onAiNpcExit();
         }
+      }
+    }
+
+    // 마우스를 올리면 살짝 들썩이고 글로우가 밝아지는 호버 반응을 추가한다.
+    // (PC 마우스 전용 — 모바일 터치에서는 pointerover가 거의 발생하지 않아 자연히 무동작)
+    addHoverBounce(target, cx, cy, width, height) {
+      const zone = this.add.zone(cx, cy, width, height).setInteractive({ useHandCursor: true });
+      const baseY = target.bodyGraphics.y;
+      const idleGlowTween = {
+        targets: target.glow,
+        alpha: { from: 0.06, to: 0.18 },
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+      };
+
+      zone.on("pointerover", () => {
+        this.tweens.killTweensOf(target.bodyGraphics);
+        this.tweens.add({
+          targets: target.bodyGraphics,
+          y: baseY - 5,
+          duration: 220,
+          yoyo: true,
+          repeat: -1,
+          ease: "Sine.easeInOut",
+        });
+        if (target.glow) {
+          this.tweens.killTweensOf(target.glow);
+          this.tweens.add({ targets: target.glow, alpha: 0.32, duration: 200, ease: "Sine.easeOut" });
+        }
+      });
+
+      zone.on("pointerout", () => {
+        this.tweens.killTweensOf(target.bodyGraphics);
+        this.tweens.add({ targets: target.bodyGraphics, y: baseY, duration: 150, ease: "Sine.easeOut" });
+        if (target.glow) {
+          this.tweens.killTweensOf(target.glow);
+          this.tweens.add(idleGlowTween);
+        }
+      });
+    }
+
+    // 외부 에셋이 없으므로 작은 단색 원 텍스처를 직접 생성해 파티클(반딧불이)에 사용한다
+    createGlowTexture(key, color, radius) {
+      if (this.textures.exists(key)) return key;
+      const size = radius * 2;
+      const g = this.add.graphics();
+      g.fillStyle(color, 1);
+      g.fillCircle(radius, radius, radius);
+      g.generateTexture(key, size, size);
+      g.destroy();
+      return key;
+    }
+
+    // 다크모드(밤) 전용 비주얼: 톤다운 오버레이 + 별 + 반딧불이 + NPC 네온 라이트.
+    // 라이트모드에서는 전부 알파 0으로 숨겨두고, 테마 전환 시 부드럽게 페이드한다.
+    createNightEffects() {
+      // 모바일은 GPU/배터리 부담이 크므로 별/반딧불이 개수와 파티클 발생 빈도를 줄인다
+      const isSmallScreen = this.scale.width < 768;
+      const starCount = isSmallScreen ? 35 : 70;
+      const fireflyFrequency = isSmallScreen ? 600 : 350;
+
+      // 전체 톤다운 오버레이. 카메라 줌/스크롤에 영향받지 않도록 화면이 아니라
+      // 월드 전체 크기로 깔아둔다 (뷰포트는 항상 월드 범위 안에 있으므로 항상 덮인다).
+      this.nightOverlay = this.add
+        .rectangle(0, 0, WORLD_W, WORLD_H, 0x0a1020, 0)
+        .setOrigin(0, 0)
+        .setDepth(9000);
+
+      // 별: 도로 위쪽(원래 '하늘'이 보이던 영역)에 흩어 놓고 각자 다른 박자로 깜빡인다
+      this.starsLayer = this.add.container(0, 0).setDepth(9010).setAlpha(0);
+      for (let i = 0; i < starCount; i++) {
+        const x = Phaser.Math.Between(0, WORLD_W);
+        const y = Phaser.Math.Between(0, ROAD_TOP - 8);
+        const baseAlpha = Phaser.Math.FloatBetween(0.3, 0.9);
+        const star = this.add.circle(x, y, Phaser.Math.Between(1, 2), 0xf0ebe1, baseAlpha);
+        this.starsLayer.add(star);
+        this.tweens.add({
+          targets: star,
+          alpha: { from: baseAlpha, to: baseAlpha * 0.25 },
+          duration: Phaser.Math.Between(1200, 2600),
+          yoyo: true,
+          repeat: -1,
+          delay: Phaser.Math.Between(0, 1500),
+        });
+      }
+
+      // 반딧불이: 잔디/인도 영역을 떠다니는 옅은 연두색 파티클
+      const fireflyTextureKey = this.createGlowTexture("firefly-glow", 0xcdeb6e, 6);
+      this.fireflyEmitter = this.add
+        .particles(0, 0, fireflyTextureKey, {
+          x: { min: 0, max: WORLD_W },
+          y: { min: ROAD_BOTTOM + 20, max: WORLD_H - 16 },
+          lifespan: { min: 3000, max: 6000 },
+          speedX: { min: -10, max: 10 },
+          speedY: { min: -10, max: 10 },
+          scale: { start: 0.6, end: 0.1 },
+          alpha: { start: 0.85, end: 0 },
+          frequency: fireflyFrequency,
+          blendMode: "ADD",
+        })
+        .setDepth(9005);
+      this.fireflyEmitter.stop();
+
+      // AI Assistant 주변 블루 네온 (오버레이보다 위 depth라 어둠 속에서도 또렷하게 빛난다)
+      this.aiNpcNeon = this.add
+        .container(this.aiNpc.cx, this.aiNpc.cy - 8)
+        .setDepth(9001)
+        .setAlpha(0);
+      const aiNeonRing = this.add.circle(0, 0, AI_NPC_RADIUS + 6, 0x4fc3f7, 0.22);
+      aiNeonRing.setStrokeStyle(3, 0x4fc3f7, 0.6);
+      this.aiNpcNeon.add(aiNeonRing);
+      this.tweens.add({
+        targets: aiNeonRing,
+        alpha: 0.5,
+        duration: 900,
+        yoyo: true,
+        repeat: -1,
+      });
+
+      // 우체통 주변 은은한 조명
+      this.mailboxNeon = this.add
+        .container(this.mailbox.cx, this.mailbox.cy - 8)
+        .setDepth(9001)
+        .setAlpha(0);
+      const mailboxLight = this.add.circle(0, 0, MAILBOX_RADIUS + 4, 0xfff4cc, 0.15);
+      this.mailboxNeon.add(mailboxLight);
+      this.tweens.add({
+        targets: mailboxLight,
+        alpha: 0.32,
+        duration: 1400,
+        yoyo: true,
+        repeat: -1,
+      });
+    }
+
+    // data-theme 속성을 읽어 현재 테마를 판단한다 (속성이 없으면 다크 테마가 기본값)
+    readCurrentTheme() {
+      return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    }
+
+    // 테마 전환 시 밤 비주얼 전체를 부드럽게 페이드 인/아웃한다.
+    // instant=true면(최초 진입 시) 깜빡임 없이 즉시 목표 알파로 맞춘다.
+    applyThemeVisuals(theme, instant = false) {
+      const isDark = theme === "dark";
+      const overlayAlpha = isDark ? 0.45 : 0;
+      const layerAlpha = isDark ? 1 : 0;
+
+      // 월드 바깥(레터박스) 영역의 배경색도 함께 바꿔 '하늘'이 옅은 크림색으로
+      // 남아있지 않게 한다. setBackgroundColor는 트윈 대상이 될 수 없으므로
+      // 카메라의 fadeOut/fadeIn 없이 즉시 전환하되, 오버레이 페이드와 겹쳐
+      // 어색함이 드러나지 않게 한다.
+      this.cameras.main.setBackgroundColor(isDark ? "#0a1020" : "#d8d0c3");
+
+      if (instant) {
+        this.nightOverlay.setAlpha(overlayAlpha);
+        this.starsLayer.setAlpha(layerAlpha);
+        this.aiNpcNeon.setAlpha(layerAlpha);
+        this.mailboxNeon.setAlpha(layerAlpha);
+      } else {
+        const duration = 600;
+        const ease = "Sine.easeInOut";
+        this.tweens.add({ targets: this.nightOverlay, alpha: overlayAlpha, duration, ease });
+        this.tweens.add({ targets: this.starsLayer, alpha: layerAlpha, duration, ease });
+        this.tweens.add({ targets: this.aiNpcNeon, alpha: layerAlpha, duration, ease });
+        this.tweens.add({ targets: this.mailboxNeon, alpha: layerAlpha, duration, ease });
+      }
+
+      if (isDark) {
+        this.fireflyEmitter?.start();
+      } else {
+        this.fireflyEmitter?.stop();
       }
     }
 

@@ -52,6 +52,9 @@ export function attachVisitorSocket(server: HttpServer): WebSocketServer {
 
     ws.on("error", (err) => {
       console.error("[visitorSocket] socket error:", err);
+      // ws 라이브러리는 error 이후 보통 close도 내보내지만, 혹시 close가 누락되는
+      // 경우를 대비해 여기서도 명시적으로 정리한다 (Set.delete는 이미 없으면 무해함).
+      clients.delete(ws);
     });
   });
 

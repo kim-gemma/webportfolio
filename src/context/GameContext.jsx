@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 
 const GameContext = createContext(null);
 
@@ -56,29 +56,54 @@ export function GameProvider({ children }) {
     setAiNpcNear(false);
   }, []);
 
-  const value = {
-    activeZone,
-    hintZone,
-    gameInstance,
-    currentScene,
-    isMobile,
-    mailboxNear,
-    mailboxModalOpen,
-    aiNpcNear,
-    openZone,
-    closeZone,
-    onZoneEnter,
-    onZoneExit,
-    onSceneReady,
-    onMailboxEnter,
-    onMailboxExit,
-    openMailboxModal,
-    closeMailboxModal,
-    onAiNpcEnter,
-    onAiNpcExit,
-    setGameInstance,
-    setIsMobile,
-  };
+  // 매 프레임 갱신되는 hintZone/mailboxNear/aiNpcNear 때문에 value가 자주 바뀌므로,
+  // 실제로 바뀐 값에 대해서만 새 객체를 만들어 불필요한 전체 트리 리렌더를 줄인다.
+  const value = useMemo(
+    () => ({
+      activeZone,
+      hintZone,
+      gameInstance,
+      currentScene,
+      isMobile,
+      mailboxNear,
+      mailboxModalOpen,
+      aiNpcNear,
+      openZone,
+      closeZone,
+      onZoneEnter,
+      onZoneExit,
+      onSceneReady,
+      onMailboxEnter,
+      onMailboxExit,
+      openMailboxModal,
+      closeMailboxModal,
+      onAiNpcEnter,
+      onAiNpcExit,
+      setGameInstance,
+      setIsMobile,
+    }),
+    [
+      activeZone,
+      hintZone,
+      gameInstance,
+      currentScene,
+      isMobile,
+      mailboxNear,
+      mailboxModalOpen,
+      aiNpcNear,
+      openZone,
+      closeZone,
+      onZoneEnter,
+      onZoneExit,
+      onSceneReady,
+      onMailboxEnter,
+      onMailboxExit,
+      openMailboxModal,
+      closeMailboxModal,
+      onAiNpcEnter,
+      onAiNpcExit,
+    ]
+  );
 
   return (
     <GameContext.Provider value={value}>

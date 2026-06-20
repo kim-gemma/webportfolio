@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { ZONES, ZONE_META } from "../config/zonesConfig";
 import DownloadButton from "./DownloadButton";
+import ThemeToggle from "./ThemeToggle";
 import { RESUME_FILE, PORTFOLIO_FILE } from "../utils/fileDownload";
 
 const TOP_BAR_LABELS = {
@@ -93,6 +94,9 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
           ariaLabel="포트폴리오 PDF 다운로드 또는 새 탭에서 열기"
         />
       </div>
+
+      {/* 데스크탑/모바일 모두 항상 노출 — 햄버거 메뉴 안에 숨기지 않는다 */}
+      <ThemeToggle />
 
       {/* 모바일(768px 이하): 햄버거 버튼. CSS로 PC에서는 숨긴다 */}
       <button

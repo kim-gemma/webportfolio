@@ -2,9 +2,11 @@
    디자인 토큰 — "코드 정원" 픽셀 포트폴리오
    ============================================================ */
 :root {
+  /* data-theme 속성이 없을 때(JS 비활성 등)를 위한 기본값 — 다크 테마와 동일 */
   --color-bg: #1a1f2e;
   --color-panel: #252b3d;
   --color-panel-raised: #2e3550;
+  --color-panel-rgb: 37, 43, 61;
   --color-grass: #4a7c59;
   --color-accent: #f4a259;
   --color-accent-soft: #f4a25933;
@@ -16,6 +18,34 @@
   --font-body: "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace, sans-serif;
   --radius-md: 10px;
   --radius-lg: 16px;
+}
+
+/* 다크 모드: 기존 네이비 팔레트를 명시적으로 고정 (오렌지/민트 포인트 컬러 유지) */
+[data-theme="dark"] {
+  --color-bg: #1a1f2e;
+  --color-panel: #252b3d;
+  --color-panel-raised: #2e3550;
+  --color-panel-rgb: 37, 43, 61;
+  --color-accent: #f4a259;
+  --color-accent-soft: #f4a25933;
+  --color-teal: #7ec8c9;
+  --color-text: #f0ebe1;
+  --color-text-dim: #b7b2a5;
+  --color-border: #3a4160;
+}
+
+/* 라이트 모드: 검정 대신 따뜻한 크림톤 배경 + 동일한 오렌지/민트 포인트 컬러 */
+[data-theme="light"] {
+  --color-bg: #f6f1e6;
+  --color-panel: #fffdf8;
+  --color-panel-raised: #ece4d3;
+  --color-panel-rgb: 255, 253, 248;
+  --color-accent: #f4a259;
+  --color-accent-soft: #f4a25933;
+  --color-teal: #4fa8a9;
+  --color-text: #1a1f2e;
+  --color-text-dim: #5b5f72;
+  --color-border: #cfc9bd;
 }
 
 * {
@@ -32,6 +62,7 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
   overflow: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 button {
@@ -173,7 +204,7 @@ a:hover {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 20px;
-  background: rgba(37, 43, 61, 0.78);
+  background: rgba(var(--color-panel-rgb), 0.78);
   backdrop-filter: blur(6px);
   border-bottom: 2px solid var(--color-border);
   /* 모달 오버레이(z-index: 50)보다 위에 있어야 Home 버튼으로 항상 모달을 닫을 수 있다 */
@@ -209,11 +240,13 @@ a:hover {
   font-size: 12px;
   padding: 8px 10px;
   border-radius: 6px;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  /* steps()로 부드러운 ease 대신 2단으로 톡 튀어오르는 픽셀아트 느낌을 낸다 */
+  transition: transform 0.1s steps(2, jump-end), background 0.15s, color 0.15s, border-color 0.15s;
 }
 .top-bar-link:hover {
   background: var(--color-panel-raised);
   color: var(--color-text);
+  transform: translateY(-2px);
 }
 .top-bar-link.active {
   color: var(--color-text);
@@ -279,10 +312,62 @@ a:hover {
   color: var(--color-text);
   font-size: 18px;
   flex-shrink: 0;
+  transition: transform 0.1s steps(2, jump-end), background 0.15s, border-color 0.15s;
 }
 .hamburger-btn:hover {
   background: var(--color-accent-soft);
   border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: transform 0.08s ease, background 0.15s, border-color 0.15s;
+}
+.theme-toggle-btn:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  transform: translateY(-2px);
+}
+.theme-toggle-btn:active {
+  transform: scale(0.92);
+}
+.theme-toggle-icon {
+  font-size: 14px;
+  line-height: 1;
+}
+/* 다크모드일 때만 🌙 아이콘에 은은한 네온 펄스를 줘서 "밤 모드 전용" UI 애니메이션을 둔다 */
+[data-theme="dark"] .theme-toggle-icon {
+  animation: themeMoonGlow 2.4s ease-in-out infinite;
+}
+@keyframes themeMoonGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: drop-shadow(0 0 6px var(--color-teal));
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-toggle-btn {
+    padding: 8px;
+    gap: 0;
+  }
+  .theme-toggle-label {
+    display: none;
+  }
 }
 
 .mobile-menu-backdrop {
@@ -353,11 +438,12 @@ a:hover {
   font-size: 12px;
   padding: 8px 10px;
   border-radius: 6px;
-  transition: transform 0.08s ease, background 0.15s, border-color 0.15s;
+  transition: transform 0.1s steps(2, jump-end), background 0.15s, border-color 0.15s;
 }
 .download-btn:hover {
   background: var(--color-accent-soft);
   border-color: var(--color-accent);
+  transform: translateY(-2px);
 }
 .download-btn.is-pressed {
   transform: scale(0.92);
@@ -478,7 +564,7 @@ a:hover {
   font-size: 11px;
   color: var(--color-text-dim);
   padding: 8px;
-  background: rgba(37, 43, 61, 0.78);
+  background: rgba(var(--color-panel-rgb), 0.78);
   backdrop-filter: blur(6px);
   border-top: 1px solid var(--color-border);
 }
@@ -493,7 +579,7 @@ a:hover {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: rgba(37, 43, 61, 0.7);
+  background: rgba(var(--color-panel-rgb), 0.7);
   border: 2px solid var(--color-border);
   z-index: 6;
   touch-action: none;
@@ -765,6 +851,11 @@ a:hover {
   font-weight: 700;
   color: var(--color-accent);
   margin: 4px 0;
+  transition: transform 0.1s steps(2, jump-end), color 0.15s;
+}
+.contact-email:hover {
+  color: var(--color-teal);
+  transform: translateX(3px);
 }
 
 .contact-email:last-of-type {
@@ -782,6 +873,13 @@ a:hover {
   padding: 10px 16px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
+  transition: transform 0.1s steps(2, jump-end), background 0.15s, border-color 0.15s, color 0.15s;
+}
+.contact-link:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  transform: translateY(-2px);
 }
 
 /* Mailbox modal */
