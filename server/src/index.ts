@@ -8,6 +8,9 @@ import { healthRouter } from "./routes/health.js";
 import { contactRouter } from "./routes/contactRoutes.js";
 
 const app = express();
+// Render 등 리버스 프록시 뒤에서 실행되므로, X-Forwarded-For 헤더를 신뢰하도록 설정
+// (express-rate-limit이 이 설정 없이는 프록시 환경에서 에러를 던진다)
+app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "10kb" }));

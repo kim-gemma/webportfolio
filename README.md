@@ -132,10 +132,10 @@ cd server
 cp .env.example .env   # DATABASE_URL 또는 MYSQL_HOST/USER/PASSWORD/DATABASE 채우기
 npm install
 npm run migrate         # contact_messages 테이블 생성
-npm run dev              # http://localhost:4000
+npm run dev              # https://webportfolio-cv10.onrender.com
 
 # 2) 프론트엔드 (별도 터미널, 저장소 루트에서)
-cp .env.example .env     # VITE_API_BASE_URL=http://localhost:4000
+cp .env.example .env     # VITE_API_BASE_URL=https://webportfolio-cv10.onrender.com
 npm install
 npm run dev               # http://localhost:5173
 ```

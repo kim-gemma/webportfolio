@@ -3,7 +3,7 @@ import type { ContactResponse } from "../types";
 
 const MAX_NAME_LENGTH = 100;
 const MAX_MESSAGE_LENGTH = 5000;
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:4000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://webportfolio-cv10.onrender.com";
 
 type SubmitStatus = "idle" | "sending" | "success" | "error";
 
