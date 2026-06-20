@@ -9,9 +9,12 @@ import VirtualJoystick from "./components/VirtualJoystick";
 import ZoneModal from "./components/ZoneModal";
 import MailboxModal from "./components/MailboxModal";
 import MailboxHint from "./components/MailboxHint";
+import NpcAiHint from "./components/NpcAiHint";
 import { ChatProvider } from "./chat/context/ChatContext";
 import ChatWidgetButton from "./chat/components/ChatWidgetButton";
 import ChatModal from "./chat/components/ChatModal";
+import { NpcChatProvider, useNpcChat } from "./npcChat/context/NpcChatContext";
+import NpcChatModal from "./npcChat/components/NpcChatModal";
 
 function GameContent() {
   const gameContainerRef = useRef(null);
@@ -25,6 +28,7 @@ function GameContent() {
     mailboxModalOpen,
     closeMailboxModal,
   } = useGame();
+  const { npcChatOpen, closeNpcChat } = useNpcChat();
 
   // 게임 인스턴스 초기화
   usePhaserGame(gameContainerRef);
@@ -53,7 +57,9 @@ function GameContent() {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code !== "Escape") return;
-      if (mailboxModalOpen) {
+      if (npcChatOpen) {
+        closeNpcChat();
+      } else if (mailboxModalOpen) {
         closeMailboxModal();
       } else if (activeZone) {
         closeZone();
@@ -62,7 +68,7 @@ function GameContent() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeZone, closeZone, mailboxModalOpen, closeMailboxModal]);
+  }, [activeZone, closeZone, mailboxModalOpen, closeMailboxModal, npcChatOpen, closeNpcChat]);
 
   const handleJoystick = useCallback((x, y) => {
     if (currentScene) {
@@ -93,6 +99,7 @@ function GameContent() {
         {/* 게임 캔버스가 렌더링되는 영역 */}
         {/* ZoneHint는 게임 위에 오버레이됨 */}
         <MailboxHint isMobile={isMobile} />
+        <NpcAiHint isMobile={isMobile} />
       </div>
 
       {isMobile && gameStarted && <VirtualJoystick onMove={handleJoystick} />}
@@ -111,9 +118,12 @@ function GameContent() {
 export default function App() {
   return (
     <ChatProvider>
-      <GameProvider>
-        <GameContent />
-      </GameProvider>
+      <NpcChatProvider>
+        <GameProvider>
+          <GameContent />
+        </GameProvider>
+        <NpcChatModal />
+      </NpcChatProvider>
       <ChatWidgetButton />
       <ChatModal />
     </ChatProvider>

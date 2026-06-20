@@ -6,6 +6,7 @@ import { env } from "./config/env.js";
 import { corsOptions } from "./middleware/cors.js";
 import { healthRouter } from "./routes/health.js";
 import { contactRouter } from "./routes/contactRoutes.js";
+import { npcChatRouter } from "./routes/npcChatRoutes.js";
 
 const app = express();
 // Render 등 리버스 프록시 뒤에서 실행되므로, X-Forwarded-For 헤더를 신뢰하도록 설정
@@ -18,6 +19,7 @@ app.use(rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: true, legacyHe
 
 app.use(healthRouter);
 app.use(contactRouter);
+app.use(npcChatRouter);
 
 app.listen(env.port, () => {
   console.log(`Contact server listening on port ${env.port}`);

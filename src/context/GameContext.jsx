@@ -10,6 +10,7 @@ export function GameProvider({ children }) {
   const [isMobile, setIsMobile] = useState(false);
   const [mailboxNear, setMailboxNear] = useState(false);
   const [mailboxModalOpen, setMailboxModalOpen] = useState(false);
+  const [aiNpcNear, setAiNpcNear] = useState(false);
 
   const openZone = useCallback((zoneKey) => {
     setActiveZone(zoneKey);
@@ -47,6 +48,14 @@ export function GameProvider({ children }) {
     setMailboxModalOpen(false);
   }, []);
 
+  const onAiNpcEnter = useCallback(() => {
+    setAiNpcNear(true);
+  }, []);
+
+  const onAiNpcExit = useCallback(() => {
+    setAiNpcNear(false);
+  }, []);
+
   const value = {
     activeZone,
     hintZone,
@@ -55,6 +64,7 @@ export function GameProvider({ children }) {
     isMobile,
     mailboxNear,
     mailboxModalOpen,
+    aiNpcNear,
     openZone,
     closeZone,
     onZoneEnter,
@@ -64,6 +74,8 @@ export function GameProvider({ children }) {
     onMailboxExit,
     openMailboxModal,
     closeMailboxModal,
+    onAiNpcEnter,
+    onAiNpcExit,
     setGameInstance,
     setIsMobile,
   };

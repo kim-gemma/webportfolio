@@ -99,12 +99,18 @@ const GREETINGS = [
 const MAILBOX_TILE = { x: 16, y: 10 };
 const MAILBOX_RADIUS = TILE * 1.3;
 
+// AI Portfolio Assistant NPC 위치: 우체통과 같은 중앙 화면, 충분히 떨어진 빈 공간
+const AI_NPC_TILE = { x: 20, y: 10 };
+const AI_NPC_RADIUS = TILE * 1.3;
+
 export function createGardenScene({
   onZoneEnter,
   onZoneExit,
   onReady,
   onMailboxEnter,
   onMailboxExit,
+  onAiNpcEnter,
+  onAiNpcExit,
 }) {
   class GardenScene extends Phaser.Scene {
     constructor() {
@@ -117,6 +123,7 @@ export function createGardenScene({
       this.currentMapIndex = 0;
       this.screenWidth = TILE * MAP_COLS;
       this.isNearMailbox = false;
+      this.isNearAiNpc = false;
     }
 
     preload() {
@@ -164,10 +171,12 @@ export function createGardenScene({
       this.createFountainSoundIcon();
       this.createProjectsSparkle();
       this.createMailbox();
+      this.createAiNpc();
       this.createPlayer();
       this.createCompass();
       this.createZoneEnterPrompt();
       this.createMailboxEnterPrompt();
+      this.createAiNpcEnterPrompt();
       this.createPlayerGuideBubble();
       this.setupCollisions();
 
@@ -852,6 +861,96 @@ export function createGardenScene({
       }
     }
 
+    // AI Portfolio Assistant NPC: 작은 로봇 모양 픽셀아트. 근처에서 Enter를 누르면
+    // React 쪽 AI 챗봇 모달(NpcChatModal)이 열린다.
+    createAiNpc() {
+      const centerScreenOffsetX = TILE * MAP_COLS;
+      const cx = centerScreenOffsetX + AI_NPC_TILE.x * TILE + TILE / 2;
+      const cy = AI_NPC_TILE.y * TILE + TILE / 2;
+      this.aiNpc = { cx, cy };
+
+      const g = this.add.graphics();
+
+      // 바닥 그림자
+      g.fillStyle(0x000000, 0.25);
+      g.fillEllipse(cx, cy + 22, 30, 11);
+
+      // 로봇 몸체
+      g.fillStyle(0x7ec8c9, 1);
+      g.fillRoundedRect(cx - 12, cy - 8, 24, 26, 6);
+      g.fillStyle(0x4a78a0, 1);
+      g.fillRect(cx - 12, cy + 10, 24, 6);
+
+      // 로봇 머리/화면
+      g.fillStyle(0xf0ebe1, 1);
+      g.fillRoundedRect(cx - 14, cy - 30, 28, 22, 6);
+      g.fillStyle(0x1a1f2e, 1);
+      g.fillRoundedRect(cx - 9, cy - 25, 8, 8, 2);
+      g.fillRoundedRect(cx + 1, cy - 25, 8, 8, 2);
+
+      // 안테나
+      g.fillStyle(0x8a6d4b, 1);
+      g.fillRect(cx - 1, cy - 38, 2, 8);
+      g.fillStyle(0xf4d35e, 1);
+      g.fillCircle(cx, cy - 40, 3);
+
+      const nameLabel = this.add
+        .text(cx, cy + 34, "AI Assistant", {
+          fontFamily: "monospace",
+          fontSize: "11px",
+          color: "#f0ebe1",
+          backgroundColor: "#1a1f2eaa",
+          padding: { x: 6, y: 3 },
+        })
+        .setOrigin(0.5);
+      this.aiNpc.label = nameLabel;
+
+      // 펄스 글로우로 시선을 끈다
+      const glow = this.add.circle(cx, cy - 8, AI_NPC_RADIUS, 0x7ec8c9, 0.08);
+      glow.setStrokeStyle(2, 0x7ec8c9, 0.35);
+      this.tweens.add({
+        targets: glow,
+        alpha: { from: 0.06, to: 0.18 },
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+      });
+      this.aiNpc.glow = glow;
+
+      // 로봇 본체만 막아서 플레이어가 통과하지 못하게 한다
+      this.createObstacle(cx, cy - 4, 26, 38);
+    }
+
+    // 플레이어와 AI NPC 사이 거리를 매 프레임 확인해 안내 말풍선과
+    // React 쪽 근접 상태(onAiNpcEnter/onAiNpcExit)를 갱신한다
+    updateAiNpcProximity() {
+      if (!this.aiNpc) return;
+      const dist = Phaser.Math.Distance.Between(
+        this.player.x,
+        this.player.y,
+        this.aiNpc.cx,
+        this.aiNpc.cy
+      );
+      const near = dist < AI_NPC_RADIUS;
+
+      if (near) {
+        this.aiNpcEnterPrompt.setPosition(this.aiNpc.cx, this.aiNpc.cy - 64);
+        this.aiNpcEnterPrompt.setVisible(true);
+      } else {
+        this.aiNpcEnterPrompt.setVisible(false);
+      }
+
+      if (near !== this.isNearAiNpc) {
+        this.isNearAiNpc = near;
+        if (near) {
+          this.pulseZoneGlow(this.aiNpc);
+          if (onAiNpcEnter) onAiNpcEnter();
+        } else if (onAiNpcExit) {
+          onAiNpcExit();
+        }
+      }
+    }
+
     // 각 zone 위치에 작은 건물/오브젝트 아이콘을 그린다
     drawZoneBuildings(offsetX = 0) {
       ZONES.forEach((zone) => {
@@ -1371,6 +1470,21 @@ export function createGardenScene({
         .setVisible(false);
     }
 
+    createAiNpcEnterPrompt() {
+      const label = this.add.text(0, 0, "🤖 Enter 키로 대화하기", {
+        fontFamily: "monospace",
+        fontSize: "11px",
+        color: "#1a1f2e",
+      });
+
+      this.aiNpcEnterPrompt = this.createRoundedCallout(label, {
+        fillColor: 0x7ec8c9,
+        borderColor: 0x1a1f2e,
+      })
+        .setDepth(35)
+        .setVisible(false);
+    }
+
     // 게임 시작 시 플레이어 머리 위에 조작 방법 안내 말풍선을 띄운다.
     // 처음 이동 입력이 들어오면 사라지고 이후 다시 표시되지 않는다.
     createPlayerGuideBubble() {
@@ -1642,6 +1756,7 @@ export function createGardenScene({
       this.updateCompass();
       this.updateInteraction();
       this.updateMailboxProximity();
+      this.updateAiNpcProximity();
     }
 
     // 입장 가능한 구역 근처에 도착하면 그 구역 위에 "Enter 키로 입장" 안내를 띄운다

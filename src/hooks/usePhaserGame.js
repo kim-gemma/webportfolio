@@ -13,6 +13,8 @@ export function usePhaserGame(containerRef) {
     onSceneReady,
     onMailboxEnter,
     onMailboxExit,
+    onAiNpcEnter,
+    onAiNpcExit,
   } = useGame();
 
   const GardenScene = useCallback(() => {
@@ -22,8 +24,18 @@ export function usePhaserGame(containerRef) {
       onReady: onSceneReady,
       onMailboxEnter,
       onMailboxExit,
+      onAiNpcEnter,
+      onAiNpcExit,
     });
-  }, [onZoneEnter, onZoneExit, onSceneReady, onMailboxEnter, onMailboxExit]);
+  }, [
+    onZoneEnter,
+    onZoneExit,
+    onSceneReady,
+    onMailboxEnter,
+    onMailboxExit,
+    onAiNpcEnter,
+    onAiNpcExit,
+  ]);
 
   useEffect(() => {
     if (!containerRef?.current || gameRef.current) {

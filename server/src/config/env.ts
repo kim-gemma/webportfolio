@@ -22,4 +22,7 @@ export const env = {
     .filter(Boolean),
   // 비워두면 알림 전송을 건너뛴다 (선택 기능이므로 필수값으로 강제하지 않음)
   discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL ?? "",
+  // NPC AI 챗봇용 Gemini API 키 (비워두면 /api/npc-chat 호출 시 503을 반환한다)
+  geminiApiKey: process.env.GEMINI_API_KEY ?? "",
+  geminiModel: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
 };
