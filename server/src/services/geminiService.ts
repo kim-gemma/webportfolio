@@ -23,8 +23,9 @@ export class GeminiApiError extends Error {
 }
 
 /**
- * Gemini generateContent REST API를 호출해 다음 모델 응답 텍스트를 받아온다.
+ * Gemini generateContent REST API(v1beta)를 호출해 다음 모델 응답 텍스트를 받아온다.
  * 공식 SDK 대신 fetch로 직접 호출해 의존성을 늘리지 않는다 (discordService와 동일한 방식).
+ * 사용할 모델은 GEMINI_MODEL 환경변수로 제어한다 (코드 하드코딩 금지).
  */
 export async function generateNpcReply(history: GeminiChatTurn[]): Promise<string> {
   if (!env.geminiApiKey) {
@@ -33,24 +34,30 @@ export async function generateNpcReply(history: GeminiChatTurn[]): Promise<strin
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${env.geminiModel}:generateContent?key=${env.geminiApiKey}`;
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: NPC_SYSTEM_PROMPT }] },
-      contents: history.map((turn) => ({
-        role: turn.role,
-        parts: [{ text: turn.text }],
-      })),
-      generationConfig: {
-        maxOutputTokens: 512,
-        temperature: 0.6,
-      },
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: NPC_SYSTEM_PROMPT }] },
+        contents: history.map((turn) => ({
+          role: turn.role,
+          parts: [{ text: turn.text }],
+        })),
+        generationConfig: {
+          maxOutputTokens: 512,
+          temperature: 0.6,
+        },
+      }),
+    });
+  } catch (err) {
+    // 네트워크 단절 등 fetch 자체가 실패한 경우 (Gemini가 응답조차 못한 상태)
+    throw new GeminiApiError(0, `Failed to reach Gemini API: ${(err as Error).message}`);
+  }
 
   if (!response.ok) {
-    const errorBody = await response.text();
+    const errorBody = await response.text().catch(() => "");
     throw new GeminiApiError(
       response.status,
       `Gemini API responded with status ${response.status}: ${errorBody}`
@@ -60,8 +67,10 @@ export async function generateNpcReply(history: GeminiChatTurn[]): Promise<strin
   const data = (await response.json()) as GeminiGenerateContentResponse;
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
+  
   if (!text) {
     throw new Error("Gemini API returned no text in response.");
+    console.log(`Gemini model: ${env.geminiModel}`);
   }
 
   return text.trim();

@@ -10,6 +10,7 @@ import ZoneModal from "./components/ZoneModal";
 import MailboxModal from "./components/MailboxModal";
 import MailboxHint from "./components/MailboxHint";
 import NpcAiHint from "./components/NpcAiHint";
+import OnlineVisitorsBadge from "./components/OnlineVisitorsBadge";
 import { ChatProvider } from "./chat/context/ChatContext";
 import ChatWidgetButton from "./chat/components/ChatWidgetButton";
 import ChatModal from "./chat/components/ChatModal";
@@ -126,6 +127,7 @@ export default function App() {
       </NpcChatProvider>
       <ChatWidgetButton />
       <ChatModal />
+      <OnlineVisitorsBadge />
     </ChatProvider>
   );
 }

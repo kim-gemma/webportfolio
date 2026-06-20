@@ -4,6 +4,8 @@ import { getNpcReply } from "../services/npcChatService.js";
 import { GeminiApiError } from "../services/geminiService.js";
 
 const QUOTA_EXCEEDED_MESSAGE = "AI 사용량이 일시적으로 초과되었습니다. 잠시 후 다시 시도해주세요.";
+const AUTH_FAILURE_MESSAGE = "AI 서비스 인증에 문제가 발생했습니다. 관리자에게 문의해주세요.";
+const MODEL_NOT_FOUND_MESSAGE = "현재 AI 모델을 사용할 수 없습니다. 관리자에게 문의해주세요.";
 const GENERIC_FAILURE_MESSAGE = "잠시 문제가 발생했습니다. 잠시 후 다시 시도해주세요.";
 
 /** POST /api/npc-chat 요청을 처리한다. */
@@ -26,10 +28,24 @@ export async function createNpcChatReply(req: Request, res: Response): Promise<v
   } catch (err) {
     console.error("[npcChatController] Gemini 응답 생성 실패:", err);
 
-    // Gemini 쿼터 초과(429)는 별도의 친절한 안내 메시지로 응답한다.
-    if (err instanceof GeminiApiError && err.status === 429) {
-      res.status(429).json({ success: false, error: QUOTA_EXCEEDED_MESSAGE });
-      return;
+    if (err instanceof GeminiApiError) {
+      // Gemini 쿼터 초과(429)는 별도의 친절한 안내 메시지로 응답한다.
+      if (err.status === 429) {
+        res.status(429).json({ success: false, error: QUOTA_EXCEEDED_MESSAGE });
+        return;
+      }
+
+      // API 키가 무효/만료된 경우 (401)
+      if (err.status === 401) {
+        res.status(502).json({ success: false, error: AUTH_FAILURE_MESSAGE });
+        return;
+      }
+
+      // GEMINI_MODEL이 해당 API 버전에서 지원되지 않는 경우 (404)
+      if (err.status === 404) {
+        res.status(502).json({ success: false, error: MODEL_NOT_FOUND_MESSAGE });
+        return;
+      }
     }
 
     res.status(502).json({ success: false, error: GENERIC_FAILURE_MESSAGE });
