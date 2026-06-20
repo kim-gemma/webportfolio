@@ -1,3 +1,4 @@
+import "dotenv/config";
 import mysql from "mysql2/promise";
 
 // DATABASE_URL이 있으면 우선 사용 (Railway 등에서 발급하는 단일 연결 문자열),
