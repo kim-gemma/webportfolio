@@ -804,3 +804,150 @@ a:hover {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+
+/* ------------------------------------------------------------
+   Contact Me 위젯 (방문자)
+   ------------------------------------------------------------ */
+.chat-widget-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 70;
+  font-family: var(--font-display);
+  font-size: 12px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 0 #c4863f, 0 12px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.08s ease;
+}
+.chat-widget-button:hover {
+  transform: translateY(-2px);
+}
+.chat-widget-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 #c4863f;
+}
+
+.chat-modal-overlay {
+  z-index: 70;
+}
+
+.chat-modal-panel {
+  display: flex;
+  flex-direction: column;
+  max-width: 420px;
+  max-height: 84vh;
+  overflow-y: auto;
+  padding: 24px 20px 20px;
+  border-top: 5px solid var(--color-teal);
+}
+
+.chat-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding-right: 28px;
+}
+
+.chat-modal-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--color-teal);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-form-intro {
+  margin: 0 0 4px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--color-text-dim);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--color-panel-raised);
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-field-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--color-text);
+}
+
+.contact-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 13px;
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  resize: none;
+}
+.contact-input:focus {
+  border-color: var(--color-accent);
+}
+
+.contact-textarea {
+  min-height: 110px;
+  line-height: 1.6;
+}
+
+.contact-form-error {
+  margin: 0;
+  font-size: 12px;
+  color: #e57373;
+}
+
+.contact-form-success {
+  margin: 0;
+  font-size: 12px;
+  color: #6fcf73;
+}
+
+.contact-send-btn {
+  align-self: flex-end;
+  font-family: var(--font-display);
+  font-size: 12px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  padding: 12px 22px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 3px 0 #c4863f;
+}
+.contact-send-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 #c4863f;
+}
+.contact-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .chat-modal-panel {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    border-top-width: 5px;
+  }
+}

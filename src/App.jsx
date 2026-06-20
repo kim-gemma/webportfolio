@@ -9,6 +9,9 @@ import VirtualJoystick from "./components/VirtualJoystick";
 import ZoneModal from "./components/ZoneModal";
 import MailboxModal from "./components/MailboxModal";
 import MailboxHint from "./components/MailboxHint";
+import { ChatProvider } from "./chat/context/ChatContext";
+import ChatWidgetButton from "./chat/components/ChatWidgetButton";
+import ChatModal from "./chat/components/ChatModal";
 
 function GameContent() {
   const gameContainerRef = useRef(null);
@@ -92,7 +95,7 @@ function GameContent() {
         <MailboxHint isMobile={isMobile} />
       </div>
 
-      {isMobile && <VirtualJoystick onMove={handleJoystick} />}
+      {isMobile && gameStarted && <VirtualJoystick onMove={handleJoystick} />}
 
       {activeZone && (
         <ZoneModal zoneKey={activeZone} onClose={closeZone} />
@@ -107,8 +110,12 @@ function GameContent() {
 
 export default function App() {
   return (
-    <GameProvider>
-      <GameContent />
-    </GameProvider>
+    <ChatProvider>
+      <GameProvider>
+        <GameContent />
+      </GameProvider>
+      <ChatWidgetButton />
+      <ChatModal />
+    </ChatProvider>
   );
 }

@@ -166,7 +166,6 @@ export function createGardenScene({
       this.createMailbox();
       this.createPlayer();
       this.createCompass();
-      this.createInteractPrompt();
       this.createZoneEnterPrompt();
       this.createMailboxEnterPrompt();
       this.createPlayerGuideBubble();
@@ -1324,21 +1323,6 @@ export function createGardenScene({
       });
     }
 
-    // NPC와 상호작용할 때 쓰는 "E" 프롬프트 + 말풍선
-    createInteractPrompt() {
-      this.interactPrompt = this.add
-        .text(0, 0, "E", {
-          fontFamily: "monospace",
-          fontSize: "12px",
-          color: "#1a1f2e",
-          backgroundColor: "#f4a259",
-          padding: { x: 6, y: 3 },
-        })
-        .setOrigin(0.5)
-        .setDepth(30)
-        .setVisible(false);
-    }
-
     // 둥근 말풍선 모양(배경 + 꼬리)을 그려서 컨테이너로 묶어 반환한다
     createRoundedCallout(label, { fillColor = 0xf0ebe1, borderColor = 0x1a1f2e, padX = 14, padY = 10 } = {}) {
       const w = label.width + padX * 2;
@@ -1517,7 +1501,9 @@ export function createGardenScene({
 
     movePlayerHome() {
       const { x: startX, y: startY } = this.getHomePosition();
-      this.player.setPosition(startX, startY);
+      // setPosition()만 호출하면 Arcade Body가 다음 스텝에 예전 위치로 되돌려 버려서
+      // 텔레포트가 즉시 취소된 것처럼 보인다. body.reset()으로 body와 좌표를 함께 옮긴다.
+      this.player.body.reset(startX, startY);
       this.cameras.main.centerOn(startX, startY);
     }
 
@@ -1670,13 +1656,6 @@ export function createGardenScene({
 
     updateInteraction() {
       const nearest = this.findNearestNpc(60);
-
-      if (nearest && !this.activeBubble) {
-        this.interactPrompt.setPosition(nearest.x, nearest.y - 50);
-        this.interactPrompt.setVisible(true);
-      } else {
-        this.interactPrompt.setVisible(false);
-      }
 
       if (
         this.interactKey &&

@@ -50,13 +50,19 @@ https://github.com/kim-gemma
 ### Frontend
 
 * React
-* JavaScript
+* JavaScript / TypeScript (Contact Form)
 * Phaser.js
 * CSS3
 
+### Backend (Contact 서버, `server/`)
+
+* Node.js / Express
+* MySQL (mysql2)
+
 ### Deployment
 
-* Vercel
+* Frontend → Vercel
+* Backend → Render
 
 ## 프로젝트 구조
 
@@ -109,13 +115,50 @@ src/
 * 모바일 조이스틱 인터페이스 구현
 * 재사용 가능한 포트폴리오 데이터 구조 설계
 
+## 📮 Contact Form
+
+방문자가 우측 하단 `📮 Contact` 버튼을 누르면 이름/이메일(선택)/메시지를 남길 수 있는 문의 폼이 열립니다. 입력 내용은 백엔드 API를 통해 MySQL `contact_messages` 테이블에 저장됩니다.
+
+### 구성
+
+* `src/chat/` — Contact Form 위젯 (TypeScript)
+* `server/` — Express + MySQL 백엔드 (별도 배포 단위, TypeScript)
+
+### 로컬 실행
+
+```bash
+# 1) 백엔드
+cd server
+cp .env.example .env   # DATABASE_URL 또는 MYSQL_HOST/USER/PASSWORD/DATABASE 채우기
+npm install
+npm run migrate         # contact_messages 테이블 생성
+npm run dev              # http://localhost:4000
+
+# 2) 프론트엔드 (별도 터미널, 저장소 루트에서)
+cp .env.example .env     # VITE_API_BASE_URL=http://localhost:4000
+npm install
+npm run dev               # http://localhost:5173
+```
+
+* 방문자: `http://localhost:5173` 에서 📮 Contact 버튼 클릭 후 폼 작성
+* 문의가 저장되면 `DISCORD_WEBHOOK_URL`로 지정한 Discord 채널에 알림이 전송됩니다 (설정하지 않으면 알림 없이 저장만 됩니다).
+
+### 배포 전 사용자가 직접 준비해야 하는 것
+
+1. **MySQL**: 사용할 MySQL 인스턴스를 준비하고 `DATABASE_URL`(또는 `MYSQL_HOST`/`MYSQL_USER`/`MYSQL_PASSWORD`/`MYSQL_DATABASE`)을 발급받습니다.
+2. **Discord Webhook**: 알림을 받을 Discord 채널 설정 → 연동 → 웹후크 → 새 웹후크 생성 → URL 복사 → `DISCORD_WEBHOOK_URL`에 설정합니다. `.env.example`은 git에 커밋되는 템플릿 파일이므로 실제 URL을 적지 말고 빈 값으로 두고, 실제 값은 gitignore된 로컬 `.env`와 배포 플랫폼의 환경변수 설정에만 입력하세요.
+
+### 배포
+
+* **백엔드 → Render**: 새 Web Service 생성 시 Root Directory를 `server`로 지정(`server/render.yaml` 참고). Build: `npm install && npm run build`, Start: `npm start`. 위 환경변수들을 Render 대시보드에 등록.
+* **프론트엔드 → Vercel**: 기존과 동일하게 배포하되, 프로젝트 환경변수에 `VITE_API_BASE_URL`(Render 백엔드 URL)을 추가.
+* Render 무료 플랜은 일정 시간 미사용 시 슬립 상태가 되어, 슬립 후 첫 요청에 몇 초 지연이 발생할 수 있습니다.
+
 ## 향후 개선 계획
 
 * 다크 모드 / 라이트 모드 전환
 * NPC 및 상호작용 추가
 * 배경 애니메이션 강화
-* 실시간 채팅 기능(WebSocket)
-* 방문자 방명록 기능
 * 프로젝트 상세 페이지 추가
 
 ## 제작자
