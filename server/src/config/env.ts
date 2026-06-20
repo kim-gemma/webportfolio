@@ -24,5 +24,5 @@ export const env = {
   discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL ?? "",
   // NPC AI 챗봇용 Gemini API 키 (비워두면 /api/npc-chat 호출 시 503을 반환한다)
   geminiApiKey: process.env.GEMINI_API_KEY ?? "",
-  geminiModel: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+  geminiModel: process.env.GEMINI_MODEL ?? "gemini-1.5-flash",
 };

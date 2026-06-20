@@ -3,6 +3,7 @@ export const NPC_GREETING =
 
 export const SUGGESTED_QUESTIONS = [
   "React Native 경험이 있나요?",
+  "React 경험이 있나요?",
   "더존비즈온에서 어떤 업무를 했나요?",
   "어떤 프로젝트를 진행했나요?",
   "가장 어려웠던 문제는 무엇이었나요?",
