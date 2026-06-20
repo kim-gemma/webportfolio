@@ -21,4 +21,5 @@ app.use(contactRouter);
 
 app.listen(env.port, () => {
   console.log(`Contact server listening on port ${env.port}`);
+  console.log(`Allowed CORS origins: ${env.allowedOrigins.join(", ")}`);
 });
