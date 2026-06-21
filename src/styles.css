@@ -282,6 +282,24 @@ a:hover {
   .top-bar-name {
     padding: 4px 8px;
   }
+
+  /* 모바일 브라우저 주소창 표시/숨김에 따른 100% 높이 출렁임을 막고,
+     게임 캔버스가 실제 보이는 화면 높이에 맞춰지도록 동적 뷰포트 단위를 쓴다. */
+  .app-shell {
+    height: 100dvh;
+  }
+
+  .top-bar {
+    padding: 8px 12px;
+    padding-top: calc(8px + env(safe-area-inset-top));
+  }
+
+  /* 모바일에는 이제 조이스틱 + Zone별 "입장하기" 버튼이 직접 떠 있어서
+     이 안내 문구가 중복이다. 게임 화면(.game-stage)이 flex:1로 가져갈 수
+     있는 높이를 늘리기 위해 모바일에서는 통째로 숨긴다. */
+  .footer-hint {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -492,6 +510,11 @@ a:hover {
 
 .game-stage canvas {
   display: block;
+  /* Phaser가 리사이즈마다 .game-stage 크기에 맞춰 인라인 px 크기를 다시 써주므로
+     보통은 이미 꽉 차 있지만, 리사이즈 이벤트가 늦게 따라오는 순간에도
+     항상 부모를 채우도록 CSS로도 보장해 둔다. */
+  width: 100%;
+  height: 100%;
 }
 
 .zone-hint {
@@ -528,6 +551,21 @@ a:hover {
 @keyframes bob {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, -6px); }
+}
+
+.zone-enter-hint {
+  border-color: var(--zone-color, var(--color-accent));
+  pointer-events: auto;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--color-text);
+}
+.zone-enter-hint .zone-hint-key {
+  background: var(--zone-color, var(--color-accent));
+  color: var(--color-bg);
+}
+.zone-enter-hint:hover {
+  background: var(--color-panel-raised);
 }
 
 .mailbox-hint {
@@ -574,8 +612,8 @@ a:hover {
    ------------------------------------------------------------ */
 .joystick-base {
   position: absolute;
-  bottom: 70px;
-  left: 30px;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: calc(30px + env(safe-area-inset-left));
   width: 96px;
   height: 96px;
   border-radius: 50%;
@@ -924,8 +962,8 @@ a:hover {
    ------------------------------------------------------------ */
 .chat-widget-button {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  right: calc(20px + env(safe-area-inset-right));
+  bottom: calc(20px + env(safe-area-inset-bottom));
   z-index: 70;
   font-family: var(--font-display);
   font-size: 12px;

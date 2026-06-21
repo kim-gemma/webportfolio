@@ -98,12 +98,14 @@ function GameContent() {
 
       <div className="game-stage" ref={gameContainerRef}>
         {/* 게임 캔버스가 렌더링되는 영역 */}
-        {/* ZoneHint는 게임 위에 오버레이됨 */}
+        {/* ZoneHint는 게임 위에 오버레이됨 (모바일 전용 "입장하기" 버튼) */}
+        <ZoneHint isMobile={isMobile} />
         <MailboxHint isMobile={isMobile} />
         <NpcAiHint isMobile={isMobile} />
       </div>
 
       {isMobile && gameStarted && <VirtualJoystick onMove={handleJoystick} />}
+      
 
       {activeZone && (
         <ZoneModal zoneKey={activeZone} onClose={closeZone} />

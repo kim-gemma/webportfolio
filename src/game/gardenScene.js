@@ -247,12 +247,24 @@ export function createGardenScene({
 
     updateCameraZoom() {
       const viewportW = this.scale.width;
+      const viewportH = this.scale.height;
       const singleScreenW = TILE * MAP_COLS;
+      const isMobile = viewportW <= 768;
 
-      // 구역들은 가로로 배치되어 있으므로 너비를 기준으로 맞춘다.
-      // 세로로 긴 모바일 화면에서는 위아래로 여백(레터박스)이 생기지만,
-      // 대신 한 화면에 너무 줌인되어 구역들이 겹쳐 보이는 문제를 피한다.
-      const zoom = Phaser.Math.Clamp(viewportW / singleScreenW, 0.6, 1.6);
+      let zoom;
+      if (isMobile) {
+        // 모바일은 세로로 길고 가로로 좁다. 너비 기준으로 줌을 맞추면 화면에
+        // 보이는 세로 영역이 WORLD_H(맵의 실제 높이)보다 훨씬 커져서, 카메라가
+        // 맵 위/아래 바깥의 빈 배경색까지 그대로 보여준다 — 이게 "위아래 여백이
+        // 많고 화면이 납작한 띠처럼 보이는" 원인이다. 대신 세로(높이) 기준으로
+        // 줌을 맞춰 보이는 세로 영역이 WORLD_H를 넘지 않게 하면 빈 여백이
+        // 없어지고, 그만큼 가로로 보이는 영역은 좁아진다(요구사항대로 가로를
+        // 희생해 세로를 화면 전체에 꽉 채운다).
+        zoom = Phaser.Math.Clamp(viewportH / WORLD_H, 1.0, 2.2);
+      } else {
+        // 데스크톱은 구역들이 가로로 배치되어 있으므로 너비를 기준으로 맞춘다.
+        zoom = Phaser.Math.Clamp(viewportW / singleScreenW, 0.6, 1.6);
+      }
 
       this.cameras.main.setZoom(zoom);
     }
@@ -1630,9 +1642,17 @@ export function createGardenScene({
       return this.add.container(0, 0, [g, label]);
     }
 
-    // 입장 가능한 구역 위에 표시할 "Enter 키로 입장" 안내 말풍선
+    // 입장 가능한 구역 위에 표시할 안내 말풍선
     createZoneEnterPrompt() {
-      const label = this.add.text(0, 0, "⏎ Enter 키로 입장", {
+      const isMobile =
+        this.scale.width <= 768 ||
+        window.matchMedia("(pointer: coarse)").matches;
+
+      const text = isMobile
+        ? "📍 구역에 들어왔습니다"
+        : "⏎ Enter 키로 입장";
+
+      const label = this.add.text(0, 0, text, {
         fontFamily: "monospace",
         fontSize: "11px",
         color: "#1a1f2e",

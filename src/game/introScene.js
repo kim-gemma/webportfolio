@@ -60,10 +60,18 @@ export class IntroScene extends Phaser.Scene {
   create() {
     const baseW = BASE_W;
     const baseH = BASE_H;
-    const scale = Math.min(this.scale.width / baseW, this.scale.height / baseH);
+    // 모바일은 가로:세로 비율이 베이스(768x512, 3:2 가로형)와 크게 달라
+    // 세로 기준까지 맞추면 배경/글자가 필요 이상으로 작아진다. 모바일에서는
+    // 너비만 기준으로 맞추고, 남는 세로 공간은 위가 아니라 아래로 가도록
+    // (top 앵커) 해서 상단 여백을 없앤다. 타이틀/PLAY 버튼은 createTitleUI에서
+    // 화면 실제 높이를 기준으로 별도 배치한다.
+    this.isMobile = this.scale.width <= 768;
+    const scale = this.isMobile
+      ? this.scale.width / baseW
+      : Math.min(this.scale.width / baseW, this.scale.height / baseH);
     this.introScale = scale;
     this.introOffsetX = (this.scale.width - baseW * scale) / 2;
-    this.introOffsetY = (this.scale.height - baseH * scale) / 2;
+    this.introOffsetY = this.isMobile ? 0 : (this.scale.height - baseH * scale) / 2;
     this.cyclePhase = 0;
 
     this.cameras.main.setBackgroundColor("#bfe3ef");
@@ -345,7 +353,10 @@ export class IntroScene extends Phaser.Scene {
     const g = this.add.graphics().setDepth(DEPTH.plaza);
     const [px, py] = this.toScreen(0, 250);
     const pw = BASE_W * this.introScale;
-    const ph = (BASE_H - 250) * this.introScale;
+    // 모바일에서는 배경 높이가 실제 화면보다 짧아질 수 있으므로, 바닥(광장) 색을
+    // 화면 맨 아래까지 늘려서 중간에 색이 끊기는 듬성한 여백이 보이지 않게 한다.
+    const phBase = (BASE_H - 250) * this.introScale;
+    const ph = this.isMobile ? Math.max(phBase, this.scale.height - py) : phBase;
     g.fillStyle(0xcdb89a, 1);
     g.fillRect(px, py, pw, ph);
 
@@ -808,12 +819,42 @@ export class IntroScene extends Phaser.Scene {
   // ------------------------------------------------------------
   createTitleUI() {
     const scale = this.introScale;
+    const isMobile = this.isMobile;
+
+    // 모바일은 introScale 자체가 작아서(가로폭 기준) 글자/버튼을 거기에 그대로
+    // 묶으면 너무 작아진다. 제목/PLAY 버튼은 화면 실제 크기를 기준으로 따로
+    // 크기·위치를 정해, 배경 그림은 작아도 UI는 "모바일 게임처럼" 크게 보이게 한다.
+    const titleFontPx = isMobile
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.1, 30, 44))
+      : 42 * scale;
+    const subtitleFontPx = isMobile
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.042, 13, 18))
+      : 17 * scale;
+    const playFontPx = isMobile
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.075, 22, 30))
+      : 32 * scale;
+    const playPaddingX = isMobile ? Math.round(this.scale.width * 0.09) : 30 * scale;
+    // 폰트 + 패딩 합이 항상 48px 이상이 되도록 모바일은 고정 18px 패딩을 쓴다
+    const playPaddingY = isMobile ? 18 : 12 * scale;
+
+    const [titleX, titleY] = isMobile
+      ? [this.scale.width / 2, this.scale.height * 0.16]
+      : this.toScreen(384, 110);
+    const [subX, subY] = isMobile
+      ? [this.scale.width / 2, this.scale.height * 0.27]
+      : this.toScreen(384, 162);
+    const [playX, playY] = isMobile
+      ? [this.scale.width / 2, this.scale.height * 0.5]
+      : this.toScreen(384, 295);
 
     const title = this.add
-      .text(...this.toScreen(384, 110), "KIM HYUNNEUNG", {
+      // 모바일은 좁은 화면에 어울리게 이름을 2줄로 나눠 표시한다
+      .text(titleX, titleY, isMobile ? "KIM\nHYUNNEUNG" : "KIM HYUNNEUNG", {
         fontFamily: "monospace",
-        fontSize: `${42 * scale}px`,
+        fontSize: `${titleFontPx}px`,
         color: "#ffffff",
+        align: "center",
+        lineSpacing: 4,
         stroke: "#333333",
         strokeThickness: 6,
       })
@@ -821,9 +862,9 @@ export class IntroScene extends Phaser.Scene {
       .setDepth(DEPTH.ui);
 
     this.add
-      .text(...this.toScreen(384, 162), "Frontend Developer\nReact Native Developer", {
+      .text(subX, subY, "Frontend Developer\nReact Native Developer", {
         fontFamily: "monospace",
-        fontSize: `${17 * scale}px`,
+        fontSize: `${subtitleFontPx}px`,
         color: "#ffffff",
         align: "center",
         lineSpacing: 6,
@@ -834,12 +875,12 @@ export class IntroScene extends Phaser.Scene {
       .setDepth(DEPTH.ui);
 
     const playButton = this.add
-      .text(...this.toScreen(384, 295), "PLAY", {
+      .text(playX, playY, "PLAY", {
         fontFamily: "monospace",
-        fontSize: `${32 * scale}px`,
+        fontSize: `${playFontPx}px`,
         color: "#ffffff",
         backgroundColor: "#e76f51",
-        padding: { x: 30 * scale, y: 12 * scale },
+        padding: { x: playPaddingX, y: playPaddingY },
       })
       .setOrigin(0.5)
       .setDepth(DEPTH.ui)
@@ -853,7 +894,7 @@ export class IntroScene extends Phaser.Scene {
 
     this.tweens.add({
       targets: title,
-      y: this.toScreen(384, 100)[1],
+      y: titleY - 10,
       duration: 900,
       yoyo: true,
       repeat: -1,
