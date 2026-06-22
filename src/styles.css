@@ -521,7 +521,8 @@ a:hover {
 
 .zone-hint {
   position: absolute;
-  bottom: 20px;
+  /* iPhone 노치/홈 인디케이터 같은 Safe Area를 침범하지 않도록 하단 여백을 확보한다 */
+  bottom: calc(20px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   background: var(--color-panel);

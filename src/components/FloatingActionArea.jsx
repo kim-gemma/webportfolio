@@ -19,6 +19,7 @@ export default function FloatingActionArea({ gameStarted }) {
     <div className="floating-action-area">
       <OnlineVisitorsBadge />
       {gameStarted && <ChatWidgetButton />}
+      
     </div>
   );
 }

@@ -868,7 +868,7 @@ export class IntroScene extends Phaser.Scene {
   createTitleSequence() {
     const scale = this.introScale;
     const isMobile = this.isMobile;
-    const { cx, titleY, nameY, role1Y, role2Y } = this.layout;
+    const { cx, titleY } = this.layout;
 
     // 모바일은 introScale 자체가 작아서(가로폭 기준) 글자를 거기에 그대로 묶으면
     // 너무 작아진다. 화면 실제 크기를 기준으로 따로 크기를 정해, 배경 그림은
@@ -886,9 +886,38 @@ export class IntroScene extends Phaser.Scene {
       ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.034, 11, 14))
       : 13 * scale;
 
+    // 좁은 화면에서는 한 줄로 그리면 화면 밖으로 넘치므로, 실제 렌더 폭을 측정해
+    // 넘칠 때만 "Pixel Garden\nPortfolio" 2줄로 바꾼다. 타이틀이 한 줄 더
+    // 늘어난 만큼 이름/직함/캐릭터/PLAY/캡션도 함께 아래로 밀어 겹치지 않게 한다.
+    const titleOneLine = "Pixel Garden Portfolio";
+    let titleText = titleOneLine;
+    if (isMobile) {
+      const measure = this.add.text(0, 0, titleOneLine, {
+        fontFamily: "monospace",
+        fontSize: `${titleFontPx}px`,
+        letterSpacing: 2,
+      });
+      const sidePadding = 28;
+      const needsWrap = measure.width > this.scale.width - sidePadding * 2;
+      const titleLineHeight = measure.height;
+      measure.destroy();
+
+      if (needsWrap) {
+        titleText = "Pixel Garden\nPortfolio";
+        const extraGap = Math.round(titleLineHeight * 0.62);
+        this.layout.nameY += extraGap;
+        this.layout.role1Y += extraGap;
+        this.layout.role2Y += extraGap;
+        this.layout.playerStopY += extraGap;
+        this.layout.playY += extraGap;
+        this.layout.captionY += extraGap;
+      }
+    }
+    const { nameY, role1Y, role2Y } = this.layout;
+
     const lines = [
       {
-        text: "Pixel Garden Portfolio",
+        text: titleText,
         y: titleY,
         fontSize: titleFontPx,
         color: "#ffd86b",
