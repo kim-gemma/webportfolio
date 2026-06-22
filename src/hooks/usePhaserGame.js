@@ -53,7 +53,8 @@ export function usePhaserGame(containerRef) {
       import("phaser"),
       import("../game/gardenScene"),
       import("../game/introScene"),
-    ]).then(([{ default: Phaser }, { createGardenScene }, { IntroScene }]) => {
+      import("../game/loadingScene"),
+    ]).then(([{ default: Phaser }, { createGardenScene }, { IntroScene }, { LoadingScene }]) => {
       // 이 effect가 cleanup된 뒤(언마운트 등)에 import가 늦게 끝나는 경우를 막는다
       if (cancelled || !containerRef?.current) return;
 
@@ -73,7 +74,8 @@ export function usePhaserGame(containerRef) {
             debug: false,
           },
         },
-        scene: [IntroScene, buildGardenScene(createGardenScene)],
+        // 배열의 첫 씬만 자동 시작되므로 LoadingScene을 가장 앞에 둔다
+        scene: [LoadingScene, IntroScene, buildGardenScene(createGardenScene)],
         pixelArt: true,
         // 모바일 GPU 부담을 줄이기 위해 프레임을 30fps로 캡 (데스크탑은 60fps 유지)
         fps: isMobile ? { target: 30, min: 24 } : undefined,

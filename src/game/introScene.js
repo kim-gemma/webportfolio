@@ -63,7 +63,7 @@ export class IntroScene extends Phaser.Scene {
     // 모바일은 가로:세로 비율이 베이스(768x512, 3:2 가로형)와 크게 달라
     // 세로 기준까지 맞추면 배경/글자가 필요 이상으로 작아진다. 모바일에서는
     // 너비만 기준으로 맞추고, 남는 세로 공간은 위가 아니라 아래로 가도록
-    // (top 앵커) 해서 상단 여백을 없앤다. 타이틀/PLAY 버튼은 createTitleUI에서
+    // (top 앵커) 해서 상단 여백을 없앤다. 타이틀/캐릭터/PLAY 버튼은 각자
     // 화면 실제 높이를 기준으로 별도 배치한다.
     this.isMobile = this.scale.width <= 768;
     const scale = this.isMobile
@@ -72,9 +72,15 @@ export class IntroScene extends Phaser.Scene {
     this.introScale = scale;
     this.introOffsetX = (this.scale.width - baseW * scale) / 2;
     this.introOffsetY = this.isMobile ? 0 : (this.scale.height - baseH * scale) / 2;
-    this.cyclePhase = 0;
+    // 인트로는 "밤의 정원" 컨셉(다크모드 브랜딩과 통일)으로 시작한다.
+    // CYCLE_STOPS상 0.48~0.8 구간이 달/별/조명이 모두 켜진 완전한 밤이다.
+    this.cyclePhase = 0.55;
+    this.playClicked = false;
 
     this.cameras.main.setBackgroundColor("#bfe3ef");
+    // LoadingScene이 같은 색(0x0a1020)으로 페이드아웃하고 끝나므로, 여기서
+    // 다시 페이드인을 걸어 두 씬이 자연스럽게 이어지도록 한다.
+    this.cameras.main.fadeIn(300, 10, 16, 32);
 
     this.generateParticleTextures();
 
@@ -96,7 +102,13 @@ export class IntroScene extends Phaser.Scene {
     this.createDog();
     this.createBird();
     this.createAmbientOverlay();
-    this.createTitleUI();
+
+    // 게임 시작 연출: 로고/이름 순차 페이드인 → 캐릭터 등장 → 인사 말풍선 → PLAY 버튼
+    this.computeLayout();
+    this.createTitleSequence();
+    this.createIntroPlayer();
+    this.createIntroBubble();
+    this.runOpeningSequence();
 
     // 리사이즈 시 좌표계가 어긋나므로 짧은 디바운스 후 씬을 다시 구성한다
     this._resizeHandler = () => {
@@ -815,89 +827,456 @@ export class IntroScene extends Phaser.Scene {
   }
 
   // ------------------------------------------------------------
-  // 타이틀 UI
+  // 오프닝 시퀀스의 모든 요소(타이틀/캐릭터/PLAY/캡션)가 화면 중앙 한 구역에
+  // 밀집되도록 좌표를 한 곳에서 계산한다. 모바일은 배경이 위쪽에 앵커되어
+  // 있어 화면 실제 높이의 비율로, 데스크톱은 기존 768x512 좌표계로 잡는다.
   // ------------------------------------------------------------
-  createTitleUI() {
+  computeLayout() {
+    if (this.isMobile) {
+      const h = this.scale.height;
+      this.layout = {
+        cx: this.scale.width / 2,
+        titleY: h * 0.28,
+        nameY: h * 0.345,
+        role1Y: h * 0.385,
+        role2Y: h * 0.415,
+        playerStopX: this.scale.width / 2,
+        playerStopY: h * 0.52,
+        playY: h * 0.61,
+        captionY: h * 0.665,
+      };
+    } else {
+      const [cx] = this.toScreen(384, 0);
+      this.layout = {
+        cx,
+        titleY: this.toScreen(0, 85)[1],
+        nameY: this.toScreen(0, 125)[1],
+        role1Y: this.toScreen(0, 150)[1],
+        role2Y: this.toScreen(0, 170)[1],
+        playerStopX: cx,
+        playerStopY: this.toScreen(0, 320)[1],
+        playY: this.toScreen(0, 395)[1],
+        captionY: this.toScreen(0, 432)[1],
+      };
+    }
+  }
+
+  // ------------------------------------------------------------
+  // 타이틀: "Pixel Garden Portfolio" + 이름/직함 3줄이 순차적으로 페이드인
+  // 1) 로고(가장 크고 강조색) 2) 이름(중간 크기) 3) 직함 2줄(가장 작고 보조색)
+  // ------------------------------------------------------------
+  createTitleSequence() {
     const scale = this.introScale;
     const isMobile = this.isMobile;
+    const { cx, titleY, nameY, role1Y, role2Y } = this.layout;
 
-    // 모바일은 introScale 자체가 작아서(가로폭 기준) 글자/버튼을 거기에 그대로
-    // 묶으면 너무 작아진다. 제목/PLAY 버튼은 화면 실제 크기를 기준으로 따로
-    // 크기·위치를 정해, 배경 그림은 작아도 UI는 "모바일 게임처럼" 크게 보이게 한다.
+    // 모바일은 introScale 자체가 작아서(가로폭 기준) 글자를 거기에 그대로 묶으면
+    // 너무 작아진다. 화면 실제 크기를 기준으로 따로 크기를 정해, 배경 그림은
+    // 작아도 UI는 "모바일 게임처럼" 크게 보이게 한다.
+    // 1) 로고: 가장 크고 강조색 — "게임 타이틀"답게
     const titleFontPx = isMobile
-      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.1, 30, 44))
-      : 42 * scale;
-    const subtitleFontPx = isMobile
-      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.042, 13, 18))
-      : 17 * scale;
-    const playFontPx = isMobile
-      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.075, 22, 30))
-      : 32 * scale;
-    const playPaddingX = isMobile ? Math.round(this.scale.width * 0.09) : 30 * scale;
-    // 폰트 + 패딩 합이 항상 48px 이상이 되도록 모바일은 고정 18px 패딩을 쓴다
-    const playPaddingY = isMobile ? 18 : 12 * scale;
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.072, 24, 32))
+      : 30 * scale;
+    // 2) 이름: 로고보다 분명히 작은 중간 크기 — "이름이 타이틀처럼 보이는" 문제 방지
+    const nameFontPx = isMobile
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.046, 16, 21))
+      : 19 * scale;
+    // 3) 직함 2줄: 가장 작고 흐린 보조색
+    const roleFontPx = isMobile
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.034, 11, 14))
+      : 13 * scale;
 
-    const [titleX, titleY] = isMobile
-      ? [this.scale.width / 2, this.scale.height * 0.16]
-      : this.toScreen(384, 110);
-    const [subX, subY] = isMobile
-      ? [this.scale.width / 2, this.scale.height * 0.27]
-      : this.toScreen(384, 162);
-    const [playX, playY] = isMobile
-      ? [this.scale.width / 2, this.scale.height * 0.5]
-      : this.toScreen(384, 295);
+    const lines = [
+      {
+        text: "Pixel Garden Portfolio",
+        y: titleY,
+        fontSize: titleFontPx,
+        color: "#ffd86b",
+        stroke: 5,
+        letterSpacing: 2,
+      },
+      { text: "Kim Hyunneung", y: nameY, fontSize: nameFontPx, color: "#ffffff", stroke: 3, letterSpacing: 0 },
+      { text: "Frontend Engineer", y: role1Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
+      { text: "React Native Developer", y: role2Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
+    ];
 
-    const title = this.add
-      // 모바일은 좁은 화면에 어울리게 이름을 2줄로 나눠 표시한다
-      .text(titleX, titleY, isMobile ? "KIM\nHYUNNEUNG" : "KIM HYUNNEUNG", {
+    this.introTitleTexts = lines.map(({ text, y, fontSize, color, stroke, letterSpacing }) => {
+      const t = this.add
+        .text(cx, y + 10, text, {
+          fontFamily: "monospace",
+          fontSize: `${fontSize}px`,
+          color,
+          align: "center",
+          stroke: "#1a1f2e",
+          strokeThickness: stroke,
+          letterSpacing,
+        })
+        .setOrigin(0.5)
+        .setDepth(DEPTH.ui)
+        .setAlpha(0);
+      t.baseY = y;
+      return t;
+    });
+  }
+
+  // 줄마다 살짝 아래에서 위로 떠오르며 순차적으로 페이드인한다
+  playTitleSequence(onDone) {
+    const stepDelay = this.isMobile ? 220 : 300;
+    const fadeDur = this.isMobile ? 360 : 450;
+
+    this.introTitleTexts.forEach((t, i) => {
+      this.tweens.add({
+        targets: t,
+        alpha: 1,
+        y: t.baseY,
+        duration: fadeDur,
+        delay: i * stepDelay,
+        ease: "Sine.easeOut",
+      });
+    });
+
+    const mainTitle = this.introTitleTexts[0];
+    const totalMs = (this.introTitleTexts.length - 1) * stepDelay + fadeDur;
+    this.time.delayedCall(totalMs + 150, () => {
+      // 메인 타이틀만 계속 은은하게 들썩인다
+      this.tweens.add({
+        targets: mainTitle,
+        y: mainTitle.baseY - 8,
+        duration: 900,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+      if (onDone) onDone();
+    });
+  }
+
+  // ------------------------------------------------------------
+  // 캐릭터 등장: 화면 밖에서 분수대 근처까지 걸어 들어온다
+  // ------------------------------------------------------------
+  createIntroPlayer() {
+    const isMobile = this.isMobile;
+    const { playerStopX: stopX, playerStopY: stopY } = this.layout;
+
+    const container = this.add.container(-80, stopY).setDepth(DEPTH.npc + 1);
+    // 모바일은 배경(introScale)과 분리된 고정 크기를 써서 캐릭터가 너무 작아지지 않게 한다
+    container.setScale(isMobile ? 1.4 : this.introScale);
+
+    const shadow = this.add.graphics();
+    shadow.fillStyle(0x000000, 0.25);
+    shadow.fillEllipse(0, 22, 30, 8);
+    container.add(shadow);
+
+    const visual = this.add.container(0, 0);
+    const g = this.add.graphics();
+    this.drawIntroPlayerSprite(g);
+    visual.add(g);
+    container.add(visual);
+
+    container.visual = visual;
+    this.introPlayer = container;
+    this.introPlayerStopX = stopX;
+  }
+
+  // GardenScene의 "me" 캐릭터와 같은 배색을 써서 같은 캐릭터처럼 보이게 한다
+  drawIntroPlayerSprite(g) {
+    const hair = 0x2b1d1d;
+    const skin = 0xffd0bd;
+    const top = 0xffc0cb;
+    const bottom = 0xff8fa3;
+
+    g.fillStyle(hair, 1);
+    g.fillRect(-12, -36, 24, 28);
+    g.fillStyle(skin, 1);
+    g.fillRoundedRect(-9, -31, 18, 19, 4);
+    g.fillStyle(0x111111, 1);
+    g.fillCircle(-4, -24, 1.8);
+    g.fillCircle(4, -24, 1.8);
+    g.fillStyle(0xd99680, 1);
+    g.fillRect(-1, -22, 2, 4);
+    g.fillStyle(0xd96b7c, 1);
+    g.fillRect(-3, -17, 6, 2);
+    g.fillStyle(skin, 1);
+    g.fillRect(-3, -12, 6, 5);
+    g.fillStyle(top, 1);
+    g.fillRoundedRect(-11, -8, 22, 18, 3);
+    g.fillStyle(skin, 1);
+    g.fillRect(-15, -5, 5, 15);
+    g.fillRect(10, -5, 5, 15);
+    g.fillStyle(bottom, 1);
+    g.fillRect(-9, 10, 7, 18);
+    g.fillRect(2, 10, 7, 18);
+  }
+
+  walkPlayerIn(onComplete) {
+    const player = this.introPlayer;
+    const duration = this.isMobile ? 1100 : 1500;
+
+    const bounce = this.tweens.add({
+      targets: player.visual,
+      y: { from: 0, to: -3 },
+      duration: 160,
+      yoyo: true,
+      repeat: -1,
+    });
+
+    this.tweens.add({
+      targets: player,
+      x: this.introPlayerStopX,
+      duration,
+      ease: "Sine.easeInOut",
+      onComplete: () => {
+        bounce.stop();
+        player.visual.y = 0;
+        if (onComplete) onComplete();
+      },
+    });
+  }
+
+  // ------------------------------------------------------------
+  // 인사 말풍선: 캐릭터 머리 위에 짧은 대사를 순서대로 보여준다
+  // ------------------------------------------------------------
+  createIntroBubble() {
+    const fontPx = this.isMobile ? 14 : Math.round(12 * Math.max(this.introScale, 1));
+    const label = this.add
+      .text(0, 0, "", {
         fontFamily: "monospace",
-        fontSize: `${titleFontPx}px`,
-        color: "#ffffff",
+        fontSize: `${fontPx}px`,
+        color: "#1a1f2e",
         align: "center",
-        lineSpacing: 4,
-        stroke: "#333333",
-        strokeThickness: 6,
       })
-      .setOrigin(0.5)
-      .setDepth(DEPTH.ui);
+      .setOrigin(0.5);
+    const bg = this.add.graphics();
 
-    this.add
-      .text(subX, subY, "Frontend Developer\nReact Native Developer", {
+    const container = this.add.container(0, 0, [bg, label]).setDepth(DEPTH.ui).setAlpha(0);
+    container.bg = bg;
+    container.label = label;
+    this.introBubble = container;
+  }
+
+  redrawIntroBubble() {
+    const { bg, label } = this.introBubble;
+    const padX = this.isMobile ? 14 : 12;
+    const padY = this.isMobile ? 9 : 8;
+    const w = label.width + padX * 2;
+    const h = label.height + padY * 2;
+    bg.clear();
+    bg.fillStyle(0xf0ebe1, 0.96);
+    bg.fillRoundedRect(-w / 2, -h / 2, w, h, 8);
+    bg.fillTriangle(-7, h / 2 - 1, 7, h / 2 - 1, 0, h / 2 + 10);
+    bg.lineStyle(2, 0xe76f51, 1);
+    bg.strokeRoundedRect(-w / 2, -h / 2, w, h, 8);
+  }
+
+  playIntroBubbleSequence(onDone) {
+    const lines = ["안녕하세요 👋", "Welcome to my Portfolio", "Let's Explore!"];
+    const lineMs = this.isMobile ? 800 : 950;
+    const bubble = this.introBubble;
+    const player = this.introPlayer;
+    const offsetY = (this.isMobile ? 1.4 : this.introScale) * 60 + 16;
+
+    let i = 0;
+    const showLine = () => {
+      bubble.label.setText(lines[i]);
+      this.redrawIntroBubble();
+      bubble.setPosition(player.x, player.y - offsetY);
+      this.tweens.add({ targets: bubble, alpha: 1, duration: 180 });
+      this.time.delayedCall(lineMs, () => {
+        this.tweens.add({
+          targets: bubble,
+          alpha: 0,
+          duration: 150,
+          onComplete: () => {
+            i++;
+            if (i < lines.length) showLine();
+            else if (onDone) onDone();
+          },
+        });
+      });
+    };
+    showLine();
+  }
+
+  // ------------------------------------------------------------
+  // PLAY 버튼: 픽셀아트 베벨(그림자+면+하이라이트) 버튼 + 등장 Fade/Scale +
+  // 평상시 은은한 펄스 + hover 시 떠오르는 효과 + 아래쪽 안내 캡션
+  // ------------------------------------------------------------
+  showPlayButton() {
+    const scale = this.introScale;
+    const isMobile = this.isMobile;
+    const { cx, playY, captionY } = this.layout;
+
+    const fontPx = isMobile
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.085, 26, 34))
+      : 30 * scale;
+    const padX = isMobile ? Math.round(this.scale.width * 0.11) : 34 * scale;
+    const padY = isMobile ? 16 : 14 * scale;
+
+    const label = this.add
+      .text(0, 0, "PLAY", {
         fontFamily: "monospace",
-        fontSize: `${subtitleFontPx}px`,
-        color: "#ffffff",
-        align: "center",
-        lineSpacing: 6,
-        stroke: "#333333",
-        strokeThickness: 4,
+        fontSize: `${fontPx}px`,
+        color: "#fff7e8",
+        letterSpacing: 2,
       })
-      .setOrigin(0.5)
-      .setDepth(DEPTH.ui);
+      .setOrigin(0.5);
 
-    const playButton = this.add
-      .text(playX, playY, "PLAY", {
+    // 텍스트 크기에 맞춰 버튼 박스를 잡고, 48px 미만으로는 내려가지 않게 한다
+    const w = label.width + padX * 2;
+    const h = Math.max(label.height + padY * 2, 48);
+
+    const bevel = this.add.graphics();
+    const drawBevel = (pressed) => {
+      const shadowH = pressed ? 1 : 5;
+      bevel.clear();
+      // 그림자 면(아래쪽, 진한 색) — 픽셀아트 버튼의 입체감
+      bevel.fillStyle(0xb5491f, 1);
+      bevel.fillRoundedRect(-w / 2, -h / 2 + shadowH, w, h, 6);
+      // 메인 면
+      bevel.fillStyle(0xe76f51, 1);
+      bevel.fillRoundedRect(-w / 2, -h / 2, w, h - shadowH, 6);
+      // 위쪽 하이라이트 줄 (눌렸을 때는 생략)
+      if (!pressed) {
+        bevel.fillStyle(0xffb199, 0.55);
+        bevel.fillRoundedRect(-w / 2 + 4, -h / 2 + 4, w - 8, 4, 2);
+      }
+      // 픽셀아트 느낌의 또렷한 외곽선
+      bevel.lineStyle(2, 0x3a1810, 1);
+      bevel.strokeRoundedRect(-w / 2, -h / 2, w, h - shadowH, 6);
+    };
+    drawBevel(false);
+
+    const container = this.add
+      .container(cx, playY, [bevel, label])
+      .setDepth(DEPTH.ui)
+      .setAlpha(0)
+      .setScale(0.5);
+    container.setSize(w, h).setInteractive({ useHandCursor: true });
+
+    // 모바일은 Enter 키가 없으므로 "Press Enter" 계열 문구를 절대 보여주지 않는다
+    const captionText = isMobile ? "Tap Play to Start" : "Press Click Play";
+    const caption = this.add
+      .text(cx, captionY, captionText, {
         fontFamily: "monospace",
-        fontSize: `${playFontPx}px`,
-        color: "#ffffff",
-        backgroundColor: "#e76f51",
-        padding: { x: playPaddingX, y: playPaddingY },
+        fontSize: isMobile ? "13px" : `${Math.round(12 * Math.max(scale, 1))}px`,
+        color: "#cfd6e6",
       })
       .setOrigin(0.5)
       .setDepth(DEPTH.ui)
-      .setInteractive({ useHandCursor: true });
+      .setAlpha(0);
 
-    playButton.on("pointerdown", () => {
-      this.scene.start("GardenScene");
+    let idlePulse = null;
+    const startIdlePulse = () => {
+      idlePulse = this.tweens.add({
+        targets: container,
+        scale: { from: 1, to: 1.045 },
+        duration: 760,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+    };
+
+    container.on("pointerover", () => {
+      if (this.playClicked) return;
+      if (idlePulse) idlePulse.stop();
+      container.setScale(1);
+      this.tweens.add({ targets: container, y: playY - 6, duration: 160, ease: "Sine.easeOut" });
     });
-    playButton.on("pointerover", () => playButton.setScale(1.06));
-    playButton.on("pointerout", () => playButton.setScale(1));
+    container.on("pointerout", () => {
+      if (this.playClicked) return;
+      this.tweens.add({
+        targets: container,
+        y: playY,
+        duration: 160,
+        ease: "Sine.easeOut",
+        onComplete: startIdlePulse,
+      });
+    });
+    // 마우스 클릭과 키보드(Enter/Space) 입력이 완전히 같은 동작을 하도록
+    // 하나의 함수로 묶는다 — PLAY 버튼은 보이는 즉시 "항상 활성 상태"라
+    // 클릭 없이도 키보드만으로 게임을 시작할 수 있다.
+    const activatePlay = () => {
+      if (this.playClicked) return;
+      drawBevel(true);
+      this.tweens.add({ targets: container, y: playY + 2, duration: 80 });
+      this.handlePlayClick(container, playY, caption);
+    };
+    container.on("pointerdown", activatePlay);
+
+    // 모바일은 Enter 키 자체가 없는 환경이므로 키보드 입력을 등록하지 않는다
+    if (!isMobile) {
+      const handleEnterOrSpace = (e) => {
+        e.preventDefault();
+        activatePlay();
+      };
+      this.input.keyboard.on("keydown-ENTER", handleEnterOrSpace);
+      this.input.keyboard.on("keydown-SPACE", handleEnterOrSpace);
+      this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+        this.input.keyboard.off("keydown-ENTER", handleEnterOrSpace);
+        this.input.keyboard.off("keydown-SPACE", handleEnterOrSpace);
+      });
+    }
 
     this.tweens.add({
-      targets: title,
-      y: titleY - 10,
-      duration: 900,
+      targets: container,
+      alpha: 1,
+      scale: 1,
+      duration: 420,
+      ease: "Back.easeOut",
+      onComplete: startIdlePulse,
+    });
+    this.tweens.add({ targets: caption, alpha: 1, duration: 420, delay: 150 });
+  }
+
+  // PLAY 클릭: 캐릭터가 몇 걸음 앞으로 이동 → 카메라 Zoom In → GardenScene 전환
+  handlePlayClick(playButton, playY, caption) {
+    if (this.playClicked) return;
+    this.playClicked = true;
+
+    playButton.disableInteractive();
+    this.tweens.add({ targets: playButton, alpha: 0, duration: 200 });
+    if (caption) this.tweens.add({ targets: caption, alpha: 0, duration: 200 });
+
+    const walkDur = this.isMobile ? 450 : 650;
+    this.tweens.add({
+      targets: this.introPlayer,
+      x: this.introPlayer.x + (this.isMobile ? 24 : 36),
+      duration: walkDur,
+      ease: "Sine.easeInOut",
+    });
+    this.tweens.add({
+      targets: this.introPlayer.visual,
+      y: { from: 0, to: -3 },
+      duration: 140,
       yoyo: true,
-      repeat: -1,
+      repeat: 2,
+    });
+
+    const zoomDur = this.isMobile ? 550 : 750;
+    this.time.delayedCall(walkDur * 0.5, () => {
+      this.tweens.add({
+        targets: this.cameras.main,
+        zoom: this.cameras.main.zoom * (this.isMobile ? 1.5 : 1.4),
+        duration: zoomDur,
+        ease: "Sine.easeInOut",
+        onComplete: () => this.scene.start("GardenScene"),
+      });
+    });
+  }
+
+  // ------------------------------------------------------------
+  // 오프닝 시퀀스 오케스트레이션: 타이틀 → 캐릭터 등장 → 인사 → PLAY 버튼
+  // ------------------------------------------------------------
+  runOpeningSequence() {
+    this.playTitleSequence(() => {
+      this.walkPlayerIn(() => {
+        this.time.delayedCall(this.isMobile ? 250 : 400, () => {
+          this.playIntroBubbleSequence(() => {
+            this.showPlayButton();
+          });
+        });
+      });
     });
   }
 

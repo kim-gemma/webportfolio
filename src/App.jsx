@@ -10,9 +10,8 @@ import ZoneModal from "./components/ZoneModal";
 import MailboxModal from "./components/MailboxModal";
 import MailboxHint from "./components/MailboxHint";
 import NpcAiHint from "./components/NpcAiHint";
-import OnlineVisitorsBadge from "./components/OnlineVisitorsBadge";
+import FloatingActionArea from "./components/FloatingActionArea";
 import { ChatProvider } from "./chat/context/ChatContext";
-import ChatWidgetButton from "./chat/components/ChatWidgetButton";
 import ChatModal from "./chat/components/ChatModal";
 import { NpcChatProvider, useNpcChat } from "./npcChat/context/NpcChatContext";
 import NpcChatModal from "./npcChat/components/NpcChatModal";
@@ -105,7 +104,10 @@ function GameContent() {
       </div>
 
       {isMobile && gameStarted && <VirtualJoystick onMove={handleJoystick} />}
-      
+
+      {/* Online Visitors 배지 + Contact 버튼을 우측 하단에 하나로 묶어 보여준다.
+          Contact는 Loading/Intro 연출 중에는 숨기고 GardenScene 입장 후에만 노출한다. */}
+      <FloatingActionArea gameStarted={gameStarted} />
 
       {activeZone && (
         <ZoneModal zoneKey={activeZone} onClose={closeZone} />
@@ -127,9 +129,7 @@ export default function App() {
         </GameProvider>
         <NpcChatModal />
       </NpcChatProvider>
-      <ChatWidgetButton />
       <ChatModal />
-      <OnlineVisitorsBadge />
     </ChatProvider>
   );
 }

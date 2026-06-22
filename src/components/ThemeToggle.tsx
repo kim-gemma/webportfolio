@@ -22,7 +22,7 @@ export default function ThemeToggle() {
       title={isDark ? "Light Mode로 전환" : "Dark Mode로 전환"}
     >
       <span className="theme-toggle-icon" aria-hidden="true">
-        {isDark ? "🌙" : "☀️"}
+        {isDark ? "🌜" : "🌞"}
       </span>
       <span className="theme-toggle-label">{isDark ? "Dark Mode" : "Light Mode"}</span>
     </button>

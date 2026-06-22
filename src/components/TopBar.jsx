@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { ZONES, ZONE_META } from "../config/zonesConfig";
 import DownloadButton from "./DownloadButton";
@@ -17,6 +17,22 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
   const { hintZone, activeZone } = useGame();
   const highlighted = activeZone || hintZone;
   const [menuOpen, setMenuOpen] = useState(false);
+  const headerRef = useRef(null);
+
+  // 실제 렌더링된 TopBar 높이를 CSS 변수로 노출해 Online Visitors Badge 등
+  // 떠 있는 UI가 TopBar 높이(safe-area, 햄버거 버튼 크기 등에 따라 가변적)에
+  // 맞춰 간격을 계산할 수 있게 한다.
+  useEffect(() => {
+    const headerEl = headerRef.current;
+    if (!headerEl) return;
+    const updateHeight = () => {
+      document.documentElement.style.setProperty("--topbar-height", `${headerEl.offsetHeight}px`);
+    };
+    updateHeight();
+    const resizeObserver = new ResizeObserver(updateHeight);
+    resizeObserver.observe(headerEl);
+    return () => resizeObserver.disconnect();
+  }, []);
 
   // 모바일 메뉴가 열려 있을 때 ESC로 닫을 수 있게 한다
   useEffect(() => {
@@ -59,7 +75,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
     ));
 
   return (
-    <header className="top-bar">
+    <header className="top-bar" ref={headerRef}>
       <span
         className="top-bar-name"
         onClick={handleHomeClick}
@@ -69,7 +85,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
         aria-label="홈으로 이동"
         title="홈으로 이동"
       >
-        🏠 HOME
+        HOME
       </span>
 
       {/* PC: 가로 메뉴. 768px 이하에서는 CSS로 숨기고 햄버거 메뉴를 대신 보여준다 */}

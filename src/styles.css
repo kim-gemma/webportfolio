@@ -18,6 +18,8 @@
   --font-body: "JetBrains Mono", "Pretendard", "Noto Sans KR", monospace, sans-serif;
   --radius-md: 10px;
   --radius-lg: 16px;
+  /* TopBar.jsx가 실제 렌더링 높이를 측정해 덮어쓴다. 이 값은 JS 실행 전 초기 렌더용 추정치다. */
+  --topbar-height: 58px;
 }
 
 /* 다크 모드: 기존 네이비 팔레트를 명시적으로 고정 (오렌지/민트 포인트 컬러 유지) */
@@ -1279,7 +1281,8 @@ a:hover {
    ------------------------------------------------------------ */
 .online-visitors-badge {
   position: fixed;
-  top: 64px;
+  /* TopBar 바로 아래 붙어 보이지 않도록 실제 TopBar 높이 + 여백만큼 띈다 */
+  top: calc(var(--topbar-height) + 12px);
   right: 16px;
   z-index: 65;
   background: var(--color-panel);
@@ -1334,9 +1337,15 @@ a:hover {
   50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(76, 175, 80, 0); }
 }
 
+@media (max-width: 768px) {
+  .online-visitors-badge {
+    /* 모바일은 화면이 좁아 더 답답해 보이므로 간격을 더 크게 둔다 */
+    top: calc(var(--topbar-height) + 16px);
+  }
+}
+
 @media (max-width: 480px) {
   .online-visitors-badge {
-    top: 58px;
     right: 8px;
     padding: 6px 9px;
     font-size: 9px;
