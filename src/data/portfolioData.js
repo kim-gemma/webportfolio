@@ -30,7 +30,7 @@ export const PORTFOLIO_DATA = {
       id: "react",
       name: "React",
       category: "Frontend",
-      level: 4,
+      level: 5,
       description:
         "React 기반 컴포넌트 설계와 상태 관리 경험을 보유하고 있으며, 재사용 가능한 UI 컴포넌트 구조와 유지보수성을 고려한 화면 개발을 수행했습니다. useState, useEffect, Custom Hook을 활용하여 비즈니스 로직과 UI를 분리했습니다.",
     },

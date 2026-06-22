@@ -897,7 +897,7 @@ export class IntroScene extends Phaser.Scene {
       },
       { text: "Kim Hyunneung", y: nameY, fontSize: nameFontPx, color: "#ffffff", stroke: 3, letterSpacing: 0 },
       { text: "Frontend Engineer", y: role1Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
-      { text: "React Native Developer", y: role2Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
+      { text: "Developer", y: role2Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
     ];
 
     this.introTitleTexts = lines.map(({ text, y, fontSize, color, stroke, letterSpacing }) => {

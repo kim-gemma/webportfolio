@@ -1421,7 +1421,9 @@ export function createGardenScene({
     drawStandingPerson(g, type) {
 
   const styles = {
-    me: [0x2b1d1d, 0xffd0bd, 0xffc0cb, 0xff8fa3],
+    // 플레이어 전용 색상 — NPC 팔레트(아래)와 겹치지 않는 사이트 시그니처 오렌지 상의로
+    // 첫눈에 "내 캐릭터"를 구분할 수 있게 한다 (상의 중앙엔 코드 배지를 별도로 그린다)
+    me: [0x2b1d1d, 0xffd0bd, 0xf4a259, 0x2e3550],
     man: [0x111111, 0xffd0bd, 0x6ac3ff, 0x333333],
     redShirt: [0x402030, 0xffd0bd, 0xe63946, 0x223355],
     rabbitWoman: [0x2b1d1d, 0xffd0bd, 0xffffff, 0xf3c6d8],
@@ -1468,6 +1470,21 @@ export function createGardenScene({
     // 상의
     g.fillStyle(top, 1);
     g.fillRoundedRect(-11, -8, 22, 18, 3);
+
+    // 개발자 컨셉 포인트: 플레이어 상의 중앙에만 작은 코드 배지를 달아
+    // NPC와 즉시 구분되도록 한다. 1px 선은 이 해상도에서 뭉개져 보이므로
+    // 2px 블록으로 큼직한 ">" 쉐브론을 그려 작아도 또렷하게 보이게 한다.
+    if (type === "me") {
+      g.fillStyle(0xf0ebe1, 1);
+      g.fillRoundedRect(-5, -6, 10, 10, 2);
+      g.lineStyle(1, 0x1a1f2e, 1);
+      g.strokeRoundedRect(-5, -6, 10, 10, 2);
+
+      g.fillStyle(0x1a1f2e, 1);
+      g.fillRect(-2, -4, 2, 2);
+      g.fillRect(0, -2, 2, 2);
+      g.fillRect(-2, 0, 2, 2);
+    }
 
     // 팔
     g.fillStyle(skin, 1);
@@ -1668,7 +1685,13 @@ export function createGardenScene({
 
     // 우체통 위에 표시할 "Enter 키로 열기" 안내 말풍선 (Zone과 다른 색으로 구분)
     createMailboxEnterPrompt() {
-      const label = this.add.text(0, 0, "✉️ Enter 키로 우편함 열기", {
+      const isMobile =
+        this.scale.width <= 768 ||
+        window.matchMedia("(pointer: coarse)").matches;
+
+      const text = isMobile ? "✉️ 우편함에 도착했습니다" : "✉️ Enter 키로 우편함 열기";
+
+      const label = this.add.text(0, 0, text, {
         fontFamily: "monospace",
         fontSize: "11px",
         color: "#f0ebe1",
@@ -1683,7 +1706,13 @@ export function createGardenScene({
     }
 
     createAiNpcEnterPrompt() {
-      const label = this.add.text(0, 0, "🤖 Enter 키로 대화하기", {
+      const isMobile =
+        this.scale.width <= 768 ||
+        window.matchMedia("(pointer: coarse)").matches;
+
+      const text = isMobile ? "🤖 AI와 대화할 수 있어요" : "🤖 Enter 키로 대화하기";
+
+      const label = this.add.text(0, 0, text, {
         fontFamily: "monospace",
         fontSize: "11px",
         color: "#1a1f2e",
@@ -1707,7 +1736,9 @@ export function createGardenScene({
       const moveLine = isMobileInput
         ? "조이스틱으로 이동해 보세요!"
         : "⬅️⬆️⬇️➡️ 화살표 키로 아바타를 이동해 보세요!";
-      const enterLine = "Enter 키를 누르면 공간에 입장할 수 있어요.";
+      const enterLine = isMobileInput
+        ? "구역 근처에서 버튼을 탭하면 입장할 수 있어요."
+        : "Enter 키를 누르면 공간에 입장할 수 있어요.";
 
       const label = this.add.text(0, 0, `${moveLine}\n${enterLine}`, {
         fontFamily: "monospace",

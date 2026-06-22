@@ -165,7 +165,7 @@ npm run dev               # http://localhost:5173
 
 김현능
 
-React Native · Frontend Engineer
+Frontend Engineer
 
 GitHub
 https://github.com/kim-gemma
