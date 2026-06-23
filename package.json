@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "phaser": "^3.80.1",
@@ -15,9 +17,14 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.4.6",
+    "@storybook/addon-docs": "^10.4.6",
+    "@storybook/react-vite": "^10.4.6",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.1",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "storybook": "^10.4.6",
     "typescript": "^5.7.2",
     "vite": "^5.4.0"
   }

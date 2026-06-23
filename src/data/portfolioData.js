@@ -17,11 +17,12 @@ export const PORTFOLIO_DATA = {
   },
 
   about: {
-    headline: "웹 퍼블리싱에서 React Native 엔터프라이즈 모바일로 성장한 Frontend Engineer",
+    headline: "웹 퍼블리싱에서 시작해 React · React Native 기반 엔터프라이즈 서비스와 AI 기능을 개발하는 Frontend Engineer",
     paragraphs: [
       "웹 퍼블리싱 기반 UI 역량에서 시작해 React Native 엔터프라이즈 모바일 개발자로 성장했습니다. 더존비즈온에서 3년 3개월간 기업용 SaaS 모바일 플랫폼을 신규 개발하며 WebView-Native Bridge 고도화와 Android/iOS 플랫폼 이슈 대응을 도맡았습니다.",
       "AI Chat UI와 STT(음성-텍스트 변환), WebSocket 기반 실시간 인터페이스를 직접 설계하고 구현했습니다. Context API, Redux, Zustand 등 상황에 맞는 상태 관리 전략을 선택해 복잡한 데이터 흐름을 안정적으로 풀어내는 것을 중요하게 생각합니다.",
       "최근에는 Spring Boot, MySQL, Docker, AWS 기반의 백엔드/클라우드 구조를 직접 학습하며 서비스 전체 아키텍처를 이해하는 풀스택 시야를 넓히고 있습니다.",
+      "이 포트폴리오 자체도 하나의 실험 공간으로 운영하고 있습니다. Storybook으로 공통 UI 컴포넌트를 문서화하고 Design Token 기반 디자인 시스템을 구축해 다크 모드와 반응형 UI를 일관되게 관리했고, OpenAI·Gemini 기반 AI Portfolio Assistant와 WebSocket 기반 실시간 방문자 표시 기능을 직접 구현했습니다. 방문자 문의는 Discord Webhook으로 알림을 받도록 연동해, 운영까지 고려한 서비스 흐름을 경험해보고 있습니다.",
     ],
   },
 
@@ -94,9 +95,33 @@ export const PORTFOLIO_DATA = {
       id: "backend-cloud",
       name: "Backend & Cloud",
       category: "Backend",
-      level: 2,
+      level: 3,
       description:
         "Spring Boot, MySQL, Docker, AWS 환경을 학습하며 프론트엔드 개발자가 이해해야 할 서버 구조와 배포 과정을 경험했습니다.",
+    },
+    {
+      id: "storybook",
+      name: "Storybook",
+      category: "Design System",
+      level: 4,
+      description:
+        "공통 UI 컴포넌트를 Storybook으로 독립된 환경에서 개발하고 문서화했습니다. 컴포넌트별로 Primary/Disabled/Loading 같은 상태를 스토리로 분리해, 실제 화면에 붙이기 전에 props와 시각적 변화를 먼저 검증할 수 있는 워크플로를 구성했습니다.",
+    },
+    {
+      id: "design-system",
+      name: "Design System",
+      category: "Architecture",
+      level: 4,
+      description:
+        "색상·여백·타이포그래피·반경 값을 Design Token으로 분리해 컴포넌트가 하드코딩된 값 대신 토큰을 참조하도록 설계했습니다. 같은 토큰 체계를 다크/라이트 모드 전환과 반응형 레이아웃에도 적용해, 화면이 늘어나도 값이 흩어지지 않도록 관리했습니다.",
+    },
+    {
+      id: "performance",
+      name: "Web Performance",
+      category: "Optimization",
+      level: 4,
+      description:
+        "Lighthouse로 성능 지표를 점검하고 React DevTools Profiler로 컴포넌트 렌더링 횟수와 원인을 분석했습니다. rollup-plugin-visualizer로 번들 구성을 시각화해 큰 청크를 파악한 뒤, 동적 import 기반 코드 스플리팅으로 초기 로딩에 필요한 번들을 줄였습니다. 렌더링 단에서는 React.memo·useMemo·useCallback으로 불필요한 재계산과 재렌더링을 줄이고, 화면에 보이지 않는 리소스는 Lazy Loading으로 지연 로드했습니다.",
     },
   ],
 
@@ -205,11 +230,28 @@ export const PORTFOLIO_DATA = {
       link: null,
     },
     {
+      id: "proj-design-system",
+      name: "Design System & Storybook",
+      description:
+        "포트폴리오 전반에서 사용하는 공통 UI 컴포넌트와 Design Token 시스템을 구축한 프로젝트입니다. Storybook을 통해 버튼, 모달, 카드, 다크 모드 UI 등 주요 컴포넌트를 문서화하고 상태별 UI를 독립적으로 검증할 수 있도록 구성했습니다.",
+      tags: ["React", "TypeScript", "Storybook", "Design System"],
+      link: null,
+    },
+    {
       id: "proj-garden-portfolio",
       name: "코드 정원 포트폴리오",
       description:
-        "이 포트폴리오 자체입니다. React와 Phaser.js를 결합해 캐릭터가 맵을 탐험하며 정보를 발견하는 게임형 인터랙션으로 구현했습니다.",
-      tags: ["React", "Phaser.js", "Pixel Art"],
+        "React, Phaser.js, TypeScript 기반 게임형 인터랙티브 포트폴리오입니다. 캐릭터가 맵을 탐험하며 정보를 발견하는 인터랙션 위에, Storybook 기반 컴포넌트 문서화와 Design Token 디자인 시스템, OpenAI/Gemini 기반 AI Portfolio Assistant, WebSocket 실시간 방문자 기능, Discord Webhook 알림까지 더해 하나의 서비스에 가깝게 구성했습니다.",
+      tags: ["React", "TypeScript", "Phaser.js", "Storybook", "WebSocket", "AI"],
+      achievements: [
+        "Storybook 기반 UI 컴포넌트 문서화",
+        "Design Token 기반 디자인 시스템 구축",
+        "OpenAI·Gemini 기반 AI Portfolio Assistant 구현",
+        "WebSocket 실시간 방문자 기능 구현",
+        "Discord Webhook 실시간 알림 연동",
+        "다크 모드 및 반응형 UI 지원",
+        "Lighthouse·React DevTools Profiler·rollup-plugin-visualizer 기반 성능 분석 및 코드 스플리팅 적용",
+      ],
       link: null,
     },
   ],

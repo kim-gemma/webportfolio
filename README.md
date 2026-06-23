@@ -50,9 +50,10 @@ https://github.com/kim-gemma
 ### Frontend
 
 * React
-* JavaScript / TypeScript (Contact Form)
+* JavaScript / TypeScript (Contact Form, Design System)
 * Phaser.js
 * CSS3
+* Storybook (공통 UI 컴포넌트 문서화)
 
 ### Backend (Contact 서버, `server/`)
 
@@ -73,7 +74,15 @@ src/
 │   ├── ZoneModal.jsx
 │   ├── ZoneHint.jsx
 │   ├── VirtualJoystick.jsx
-│   └── DownloadButton.jsx
+│   ├── DownloadButton.jsx
+│   └── ui/                  # 디자인 시스템 공통 컴포넌트 (Storybook 전용, 게임 UI와 독립)
+│       ├── Button/
+│       ├── Input/
+│       ├── Modal/
+│       ├── Card/
+│       └── Badge/
+│
+├── design-system/           # 디자인 토큰 (colors / spacing / typography / radius)
 │
 ├── game/
 │   ├── introScene.js
@@ -89,6 +98,8 @@ src/
 │   └── portfolioData.js
 │
 └── utils/
+
+.storybook/                  # Storybook 설정 (main.ts / preview.tsx)
 ```
 
 ## 조작 방법
@@ -154,9 +165,62 @@ npm run dev               # http://localhost:5173
 * **프론트엔드 → Vercel**: 기존과 동일하게 배포하되, 프로젝트 환경변수에 `VITE_API_BASE_URL`(Render 백엔드 URL)을 추가.
 * Render 무료 플랜은 일정 시간 미사용 시 슬립 상태가 되어, 슬립 후 첫 요청에 몇 초 지연이 발생할 수 있습니다.
 
+## 🎨 Design System & Storybook
+
+### 도입 배경
+
+이 프로젝트는 Phaser 캔버스로 그려지는 게임 화면과 React/CSS로 만든 DOM UI(모달, 버튼, 배지 등)가 함께 있어, 색상·여백·타이포그래피 값이 여러 CSS 파일에 흩어지기 쉬운 구조입니다. 공통 UI 컴포넌트를 게임 로직과 분리된 환경에서 독립적으로 만들고 검증할 수 있도록 Storybook을 도입하고, 그 컴포넌트들이 참조할 디자인 토큰을 한 곳에 모았습니다.
+
+`src/components/ui`의 컴포넌트들은 실제 게임 화면(TopBar, ChatWidgetButton 등)을 대체하지 않는 **독립적인 디자인 시스템 데모**입니다. Storybook이 유일한 사용/검증 환경이며, 향후 새 UI를 추가할 때 참고할 수 있는 기준점 역할을 합니다.
+
+### 프로젝트 구조
+
+```bash
+src/
+├── design-system/
+│   ├── colors.ts        # 라이트/다크 테마별 색상
+│   ├── spacing.ts        # 4px 기준 여백 스케일
+│   ├── typography.ts     # 폰트 패밀리 / 크기 / 굵기 / 줄높이
+│   ├── radius.ts          # 모서리 반경
+│   ├── useThemeColors.ts  # 현재 테마(data-theme)를 구독해 colors를 반환하는 훅
+│   ├── DesignSystemOverview.tsx          # Storybook 개요 페이지 컴포넌트
+│   └── DesignSystemOverview.stories.tsx  # 개요 페이지를 "Design System/Overview"로 노출
+│
+└── components/ui/
+    ├── Button/  (Button.tsx, Button.stories.tsx, index.ts)
+    ├── Input/   (Input.tsx, Input.stories.tsx, index.ts)
+    ├── Modal/   (Modal.tsx, Modal.stories.tsx, index.ts)
+    ├── Card/    (Card.tsx, Card.stories.tsx, index.ts)
+    └── Badge/   (Badge.tsx, Badge.stories.tsx, index.ts)
+```
+
+### 실행 방법
+
+```bash
+npm run storybook         # http://localhost:6006 에서 컴포넌트 카탈로그 실행
+npm run build-storybook   # storybook-static/ 에 정적 빌드 생성
+```
+
+### 컴포넌트 관리 방식
+
+* 컴포넌트 폴더 하나당 `ComponentName.tsx` + `ComponentName.stories.tsx` + `index.ts` 3개 파일로 구성합니다.
+* 색상/여백/폰트/모서리 반경은 직접 px·hex 값을 쓰지 않고 `src/design-system` 토큰을 import해서 씁니다.
+* 각 스토리 파일에 `tags: ["autodocs"]`를 지정해, 컴포넌트 상단 JSDoc 설명과 `argTypes`의 prop 설명이 Storybook Docs 탭에 자동으로 표 형태 문서로 생성되도록 했습니다.
+* Storybook 툴바의 테마 토글(🌙/☀️)은 실제 서비스의 `src/theme/theme.ts` 라이트/다크 전환 로직을 그대로 재사용합니다 — 두 곳의 테마 값이 어긋나지 않습니다.
+
+### 디자인 시스템 설명
+
+| 토큰 파일 | 내용 |
+| --- | --- |
+| `colors.ts` | `styles.css`의 `:root`/`[data-theme]` 변수와 동일한 값을 미러링한 라이트/다크 색상 |
+| `spacing.ts` | `xs`(4px) ~ `2xl`(32px) 여백 스케일 |
+| `typography.ts` | 픽셀 폰트(Press Start 2P)와 모노스페이스 본문 폰트, 크기/굵기/줄높이 |
+| `radius.ts` | `sm`/`md`/`lg`/`full` 모서리 반경 |
+
+각 `ui` 컴포넌트가 상태별로 어떻게 보이는지는 Storybook에서 직접 확인할 수 있습니다 (예: `Button`의 Primary/Secondary/Disabled/Loading, `Input`의 Default/Placeholder/Error/Disabled, `Modal`의 Open/Closed).
+
 ## 향후 개선 계획
 
-* 다크 모드 / 라이트 모드 전환
 * NPC 및 상호작용 추가
 * 배경 애니메이션 강화
 * 프로젝트 상세 페이지 추가

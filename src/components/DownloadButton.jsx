@@ -1,8 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { openDownloadFile } from "../utils/fileDownload";
 import { playClickSound } from "../utils/sound";
 
-export default function DownloadButton({
+// TopBar(데스크톱) 안에서 file/icon/label/ariaLabel이 고정된 채로 여러 번 렌더링되므로,
+// TopBar가 hintZone/activeZone 변경 등 무관한 이유로 리렌더될 때 함께 리렌더되지 않도록 memo한다.
+function DownloadButton({
   file,
   icon,
   label,
@@ -35,3 +37,5 @@ export default function DownloadButton({
     </button>
   );
 }
+
+export default memo(DownloadButton);

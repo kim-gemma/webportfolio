@@ -10,3 +10,6 @@ server/dist
 server/.env
 server/.env.*
 !server/.env.example
+
+*storybook.log
+storybook-static

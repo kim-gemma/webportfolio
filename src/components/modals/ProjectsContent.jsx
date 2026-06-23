@@ -18,6 +18,13 @@ export default function ProjectsContent() {
                 </span>
               ))}
             </div>
+            {p.achievements?.length > 0 && (
+              <ul className="project-achievements">
+                {p.achievements.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            )}
             {p.link && (
               <a
                 href={p.link}
