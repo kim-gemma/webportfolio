@@ -206,6 +206,20 @@ export const PORTFOLIO_DATA = {
       link: null,
     },
     {
+      id: "proj-amaranth-chat",
+      name: "Amaranth10 Messenger & Video Conference",
+      description:
+        "기업용 메신저 및 화상회의 모바일 서비스 개발. 조직도 기반 참여자 초대, 채팅방 관리, 화상회의 입장 프로세스, AI 회의록 연동 기능을 구현했으며 공통 댓글 및 커뮤니케이션 기능을 모바일 환경에 최적화했습니다.",
+      tags: [
+        "React Native",
+        "React",
+        "REST API",
+        "WebRTC",
+        "Enterprise Collaboration"
+      ],
+      link: null,
+    },
+    {
       id: "proj-whatflix",
       name: "WhatFlix",
       description:
