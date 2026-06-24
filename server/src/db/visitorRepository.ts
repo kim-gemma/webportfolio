@@ -3,8 +3,8 @@ import { pool } from "./pool.js";
 
 export interface VisitorStats {
   onlineCount: number;
-  totalVisits: number;
-  todayVisits: number;
+  totalVisits: number | null;
+  todayVisits: number | null;
 }
 
 export interface RecentVisitorSession {

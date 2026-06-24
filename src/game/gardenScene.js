@@ -73,6 +73,13 @@ export const ZONES = [
     color: 0xe98ca0,
   },
   {
+    key: "architecture",
+    label: "Architecture",
+    tile: { x: 11, y: 12 },
+    icon: "server",
+    color: 0x9db4ff,
+  },
+  {
     key: "contact",
     label: "Contact",
     tile: { x: 11, y: 8 },
@@ -1202,6 +1209,17 @@ export function createGardenScene({
           g.fillRect(cx - 18, cy - 24, 14, 10);
           g.fillRect(cx - 2, cy - 24, 14, 10);
           g.fillRect(cx - 18, cy - 10, 14, 6);
+        } else if (zone.icon === "server") {
+          g.fillStyle(0x3a4160, 1);
+          g.fillRoundedRect(cx - 22, cy - 28, 44, 46, 4);
+          g.fillStyle(0x9db4ff, 1);
+          g.fillRect(cx - 15, cy - 20, 30, 6);
+          g.fillRect(cx - 15, cy - 8, 30, 6);
+          g.fillRect(cx - 15, cy + 4, 30, 6);
+          g.fillStyle(0x7ec8c9, 1);
+          g.fillCircle(cx + 12, cy - 17, 3);
+          g.fillCircle(cx + 12, cy - 5, 3);
+          g.fillCircle(cx + 12, cy + 7, 3);
         } else if (zone.icon === "mailbox") {
           g.fillStyle(0x8a6d4b, 1);
           g.fillRect(cx - 3, cy, 6, 22);
@@ -1862,6 +1880,22 @@ export function createGardenScene({
       // 텔레포트가 즉시 취소된 것처럼 보인다. body.reset()으로 body와 좌표를 함께 옮긴다.
       this.player.body.reset(startX, startY);
       this.cameras.main.centerOn(startX, startY);
+    }
+
+    movePlayerToZone(zoneKey) {
+      const screenW = TILE * MAP_COLS;
+      const screenIndex = Phaser.Math.Clamp(
+        Math.floor((this.player?.x ?? screenW) / screenW),
+        0,
+        2
+      );
+      const marker = this.zoneMarkers[`${zoneKey}-screen-${screenIndex}`] || this.zoneMarkers[`${zoneKey}-screen-0`];
+      if (!marker || !this.player?.body) return;
+
+      const targetX = Phaser.Math.Clamp(marker.cx, 16, WORLD_W - 16);
+      const targetY = Phaser.Math.Clamp(marker.cy + 74, 220, WORLD_H - 16);
+      this.player.body.reset(targetX, targetY);
+      this.cameras.main.centerOn(targetX, targetY);
     }
 
     // Home 버튼이 불필요하게 카메라/플레이어를 다시 이동시키지 않도록,

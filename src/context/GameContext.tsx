@@ -7,6 +7,7 @@ export type GameInstance = { destroy: (removeCanvas?: boolean) => void } | null;
 export type GardenSceneLike = {
   isAtHome?: () => boolean;
   movePlayerHome?: () => void;
+  movePlayerToZone?: (zoneKey: ZoneKey) => void;
   setJoystickVector?: (x: number, y: number) => void;
 } | null;
 

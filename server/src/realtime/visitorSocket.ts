@@ -28,8 +28,8 @@ async function broadcastVisitorStats(): Promise<void> {
     console.error("[visitorSocket] visitor stats 조회 실패:", err);
     return {
       onlineCount: clients.size,
-      totalVisits: clients.size,
-      todayVisits: clients.size,
+      totalVisits: null,
+      todayVisits: null,
     };
   });
 

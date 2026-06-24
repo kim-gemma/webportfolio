@@ -221,6 +221,29 @@ export const PORTFOLIO_DATA = {
         "기업 사용자가 문서 분석, 음성 입력, AI 응답을 모바일에서 빠르게 활용할 수 있도록 만든 AI 생산성 서비스입니다. 실시간 AI 응답 환경과 안정적인 STT 상태 관리를 통해 회의·문서 업무 중 발생하는 대기 시간과 입력 불편을 줄였습니다.",
       tags: ["AI Productivity", "React Native", "STT", "Real-time AI"],
       link: null,
+      featured: true,
+      overview:
+        "기업 사용자가 모바일에서 AI 문서 분석, 음성 입력, AI 응답을 업무 흐름 안에서 바로 사용할 수 있도록 만든 생산성 기능입니다.",
+      problem:
+        "AI 응답은 지연 시간이 길고 STT/OCR은 플랫폼 권한과 네트워크 상태에 따라 실패 가능성이 높아, 모바일 업무 화면에서 사용자가 상태를 이해하기 어려웠습니다.",
+      solution:
+        "AI 요청 상태를 명확히 분리하고, 응답 생성 중 UI와 실패/재시도 흐름을 설계했습니다. STT 권한, 입력 상태, 결과 반영 흐름을 화면 상태와 분리해 안정적으로 제어했습니다.",
+      outcome:
+        "회의 정리, 문서 탐색, 음성 입력처럼 반복되는 업무를 모바일에서 이어갈 수 있게 하며 AI 기능을 독립 데모가 아닌 실제 업무 서비스 경험으로 연결했습니다.",
+      techStack: ["React Native", "TypeScript", "OpenAI", "STT", "OCR", "Streaming UI"],
+      ownership: [
+        "AI Chat 및 응답 상태 UI 구현",
+        "STT 권한/녹음/결과 반영 흐름 개발",
+        "AI 회의록·OCR 기능의 모바일 사용성 개선",
+        "로딩, 실패, 재시도 상태를 포함한 사용자 피드백 설계",
+      ],
+      architectureNote:
+        "Architecture Zone에서 Frontend → Backend → AI 응답 흐름과 실시간 UI 연결 구조를 확인할 수 있습니다.",
+      interviewQuestions: [
+        "Q. AI Streaming UI는 어떻게 구현했나요?",
+        "Q. STT 권한과 녹음 상태는 어떤 기준으로 분리했나요?",
+        "Q. AI 응답 실패 시 사용자 경험은 어떻게 설계했나요?",
+      ],
     },
     {
       id: "proj-onechamber",
@@ -229,6 +252,29 @@ export const PORTFOLIO_DATA = {
         "기업 사용자가 대용량 문서를 모바일에서도 안정적으로 등록·관리할 수 있도록 지원한 문서관리 서비스입니다. 100MB 이상 파일 업로드 과정의 실패 가능성을 줄이고, 문서 처리 상태를 명확히 분리해 업무 중단 없이 문서 업무를 이어갈 수 있게 했습니다.",
       tags: ["Document Management", "Enterprise SaaS", "React Native", "REST API"],
       link: null,
+      featured: true,
+      overview:
+        "기업 문서를 모바일에서 등록, 업로드, 조회할 수 있게 만든 문서관리 서비스입니다.",
+      problem:
+        "모바일 환경에서는 대용량 파일 업로드 실패, Android/iOS 파일 경로 차이, 권한 기반 문서 접근 같은 제약이 동시에 발생했습니다.",
+      solution:
+        "파일 선택, 업로드 상태, 서버 응답 처리, 실패 피드백을 단계별로 분리했습니다. 플랫폼별 파일 저장/접근 차이를 고려해 네이티브 연동 흐름을 안정화했습니다.",
+      outcome:
+        "100MB 이상 파일 업로드와 문서 처리 상태를 사용자가 이해할 수 있게 만들고, PC 중심 문서 업무를 모바일에서도 끊기지 않게 확장했습니다.",
+      techStack: ["React Native", "REST API", "WebView-Native Bridge", "Android/iOS File System", "Enterprise SaaS"],
+      ownership: [
+        "대용량 문서 업로드 UI 및 상태 처리",
+        "Android/iOS 파일 저장·접근 차이 대응",
+        "권한 기반 문서 조회 흐름 구현",
+        "문서 처리 상태와 오류 피드백 개선",
+      ],
+      architectureNote:
+        "Architecture Zone에서 모바일 프론트엔드와 백엔드/데이터베이스로 이어지는 문서 데이터 흐름을 확인할 수 있습니다.",
+      interviewQuestions: [
+        "Q. Android와 iOS 파일 저장 차이를 어떻게 해결했나요?",
+        "Q. 대용량 업로드 실패 가능성은 어떻게 줄였나요?",
+        "Q. 기업 문서 권한 처리는 프론트엔드에서 어떻게 표현했나요?",
+      ],
     },
     {
       id: "proj-oneffice",
@@ -237,6 +283,29 @@ export const PORTFOLIO_DATA = {
         "기업 사용자가 모바일 환경에서도 PC와 동일한 문서·협업 업무를 수행할 수 있도록 지원한 모바일 서비스입니다. WebView-Native Bridge, 인증, 권한 제어를 통해 기존 업무 시스템을 모바일로 확장하면서 기업 보안 요구사항에 대응했습니다.",
       tags: ["Mobile Enterprise Platform", "WebView", "RBAC", "Enterprise Security"],
       link: null,
+      featured: true,
+      overview:
+        "기존 PC 기반 문서·협업 업무를 모바일에서도 사용할 수 있도록 확장한 기업용 모바일 플랫폼 경험입니다.",
+      problem:
+        "PC 업무 기능을 모바일로 옮길 때 인증, 권한, WebView와 Native 간 데이터 전달, 플랫폼별 보안 정책이 복잡하게 얽혔습니다.",
+      solution:
+        "WebView-Native Bridge로 양방향 통신을 구성하고, 인증/권한 상태를 화면 진입과 기능 실행 조건에 맞춰 제어했습니다.",
+      outcome:
+        "기업 사용자가 모바일에서도 문서 작성, 조회, 협업 업무를 이어갈 수 있게 했고, 기존 시스템과 모바일 앱 사이의 경험 차이를 줄였습니다.",
+      techStack: ["React Native", "WebView", "Native Bridge", "RBAC", "Enterprise Security"],
+      ownership: [
+        "WebView-Native Bridge 기반 기능 연동",
+        "인증 및 권한 상태에 따른 화면/기능 제어",
+        "모바일 플랫폼별 예외 케이스 대응",
+        "기존 PC 업무 플로우의 모바일 UX 변환",
+      ],
+      architectureNote:
+        "Architecture Zone에서 Frontend 레이어의 React Native/WebView Bridge 역할을 따로 정리했습니다.",
+      interviewQuestions: [
+        "Q. WebView-Native Bridge는 어떤 방식으로 설계했나요?",
+        "Q. 기업 보안 요구사항은 모바일 화면에서 어떻게 반영했나요?",
+        "Q. 권한 상태와 화면 상태는 어떻게 분리했나요?",
+      ],
     },
     {
       id: "proj-amaranth-chat",
@@ -251,6 +320,29 @@ export const PORTFOLIO_DATA = {
         "React Native",
       ],
       link: null,
+      featured: true,
+      overview:
+        "기업 조직도 기반 메신저와 화상회의 흐름을 모바일에서 사용할 수 있게 만든 실시간 협업 경험입니다.",
+      problem:
+        "메신저, 조직도, 참여자 초대, 회의 입장, AI 회의록은 각각 다른 기능처럼 보이지만 실제 업무에서는 하나의 커뮤니케이션 흐름으로 이어져야 했습니다.",
+      solution:
+        "조직도 기반 사용자 선택, 채팅방 관리, 회의 입장 상태, 회의록 연결 흐름을 모바일 화면에 맞춰 정리하고 실시간 상태 변화를 빠르게 반영했습니다.",
+      outcome:
+        "커뮤니케이션, 회의, 기록이 분리되지 않고 하나의 업무 흐름으로 이어지도록 구성해 기업 협업 서비스의 모바일 사용성을 높였습니다.",
+      techStack: ["React Native", "WebSocket", "Real-time Communication", "Video Conference", "AI Meeting Notes"],
+      ownership: [
+        "조직도 기반 사용자 탐색 및 참여자 초대 흐름 구현",
+        "메신저/채팅방 관리 UI 개발",
+        "화상회의 입장 및 회의 상태 화면 구현",
+        "AI 회의록과 커뮤니케이션 흐름 연결",
+      ],
+      architectureNote:
+        "Architecture Zone에서 WebSocket 기반 실시간 통신이 UI 상태와 어떻게 연결되는지 확인할 수 있습니다.",
+      interviewQuestions: [
+        "Q. WebSocket을 사용한 이유는?",
+        "Q. 실시간 상태와 화면 상태는 어떻게 동기화했나요?",
+        "Q. 메신저와 화상회의 UX를 모바일에서 어떻게 단순화했나요?",
+      ],
     },
     {
       id: "proj-whatflix",
@@ -290,6 +382,24 @@ export const PORTFOLIO_DATA = {
       description:
         "면접관이 이력서를 순서대로 읽는 대신 직접 탐색하며 경험을 확인할 수 있도록 만든 인터랙티브 포트폴리오입니다. AI Portfolio Assistant, 실시간 방문자 표시, 문의 알림, 디자인 시스템을 연결해 단순 소개 페이지가 아니라 운영 가능한 작은 서비스처럼 구성했습니다.",
       tags: ["React", "TypeScript", "Phaser.js", "AI Productivity", "WebSocket" ,],
+      featured: true,
+      overview:
+        "경력 정보를 게임형 인터페이스로 탐색하되, 실제 운영 가능한 작은 서비스처럼 AI, 실시간 접속자, 문의 알림, 데이터 저장을 연결한 포트폴리오입니다.",
+      problem:
+        "일반 포트폴리오는 기억에 남기 어렵고, 단순 프론트엔드 화면만으로는 백엔드/실시간/AI 연결 경험을 보여주기 어렵습니다.",
+      solution:
+        "React와 Phaser로 탐색 경험을 만들고, Node.js 서버, MySQL, WebSocket, AI API, Discord 알림, AWS 배포를 연결해 서비스 흐름 전체를 구성했습니다.",
+      outcome:
+        "프론트엔드 중심 역량을 유지하면서도 실시간 통신, AI 연동, 데이터 저장, 배포 운영 이해를 함께 보여주는 경력 전시관으로 확장했습니다.",
+      techStack: ["React", "TypeScript", "Phaser.js", "Node.js", "MySQL", "WebSocket", "OpenAI", "AWS"],
+      ownership: [
+        "게임형 인터랙션과 포트폴리오 정보 구조 설계",
+        "AI Portfolio Assistant UI 및 API 연동",
+        "WebSocket 기반 실시간 방문자 표시 구현",
+        "문의 저장, Discord 알림, AWS 배포 흐름 구성",
+      ],
+      architectureNote:
+        "Architecture Zone에서 Frontend → Backend → Database → Infra → AI 전체 연결을 시각화했습니다.",
       achievements: [
         "Storybook 기반 UI 컴포넌트 문서화",
         "AWS S3 + CloudFront 기반 프론트엔드 배포",
@@ -304,8 +414,60 @@ export const PORTFOLIO_DATA = {
         "Lighthouse·React DevTools Profiler·rollup-plugin-visualizer 기반 성능 분석 및 코드 스플리팅 적용",
       ],
       link: null,
+      interviewQuestions: [
+        "Q. Zustand를 선택한 이유는?",
+        "Q. WebSocket 실시간 방문자 기능은 어떻게 구현했나요?",
+        "Q. 프론트엔드 포트폴리오에 Node.js와 MySQL을 연결한 이유는?",
+      ],
     },
   ],
+
+  architecture: {
+    layers: [
+      {
+        name: "Frontend",
+        stack: "React Native · React · Phaser.js",
+        description:
+          "기업용 모바일 업무 화면, 게임형 포트폴리오 UI, AI/실시간 상태 UI를 구성합니다.",
+      },
+      {
+        name: "Backend",
+        stack: "Node.js · Express · REST API · WebSocket",
+        description:
+          "문의, AI 요청, 실시간 방문자 상태, 알림 연동을 처리하는 서버 레이어입니다.",
+      },
+      {
+        name: "Database",
+        stack: "MySQL · AWS RDS",
+        description:
+          "문의 데이터와 방문자 이벤트처럼 서비스 운영에 필요한 데이터를 저장합니다.",
+      },
+      {
+        name: "Infra",
+        stack: "AWS S3 · CloudFront · EC2 · Nginx · PM2",
+        description:
+          "정적 프론트엔드 배포, 서버 운영, 로그 모니터링, 프로세스 관리를 담당합니다.",
+      },
+      {
+        name: "AI",
+        stack: "OpenAI · Gemini · STT · OCR",
+        description:
+          "AI Portfolio Assistant와 업무 생산성 기능의 응답 생성, 문서/음성 처리 흐름을 연결합니다.",
+      },
+    ],
+    ownership: [
+      "React/React Native 화면에서 API, WebSocket, AI 응답 상태를 사용자 경험으로 연결",
+      "Node.js 서버와 MySQL 저장소를 구성해 문의와 방문자 데이터를 운영 가능한 형태로 관리",
+      "AWS 기반 프론트엔드/서버 배포 구조를 직접 구성하고 로그 모니터링 흐름을 정리",
+      "OpenAI·Gemini 기반 AI 기능을 화면 상태, 로딩, 실패 처리와 함께 통합",
+    ],
+    interviewQuestions: [
+      "Q. Frontend와 WebSocket 연결 구조는 어떻게 설계했나요?",
+      "Q. AI 응답 상태를 UI에서 어떻게 표현했나요?",
+      "Q. AWS에서 프론트엔드와 서버를 분리해 배포한 이유는?",
+      "Q. MySQL에는 어떤 데이터를 저장하고 왜 저장했나요?",
+    ],
+  },
 
   contact: {
     message: "함께 일하고 싶으시거나 궁금한 점이 있으시면 편하게 연락 주세요.",

@@ -10,6 +10,7 @@ const TOP_BAR_LABELS: Record<string, string> = {
   technologies: "Skills",
   cv: "CV",
   projects: "Projects",
+  architecture: "Architecture",
   contact: "Contact",
 };
 
@@ -107,18 +108,18 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
       <div
         className="top-bar-downloads top-bar-downloads-desktop"
         role="group"
-        aria-label="문서 다운로드"
+        aria-label="주요 링크"
       >
         <DownloadButton
           file={RESUME_FILE}
           icon="📄"
-          label="Resume"
+          label="Resume PDF"
           ariaLabel="이력서 PDF 다운로드 또는 새 탭에서 열기"
         />
         <DownloadButton
           file={PORTFOLIO_FILE}
           icon="📁"
-          label="Portfolio"
+          label="Portfolio PDF"
           ariaLabel="포트폴리오 PDF 다운로드 또는 새 탭에서 열기"
         />
       </div>
@@ -156,7 +157,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
               <DownloadButton
                 file={RESUME_FILE}
                 icon="📄"
-                label="Resume"
+                label="Resume PDF"
                 ariaLabel="이력서 PDF 다운로드 또는 새 탭에서 열기"
                 className="download-btn-large"
                 onAfterClick={() => setMenuOpen(false)}
@@ -164,7 +165,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
               <DownloadButton
                 file={PORTFOLIO_FILE}
                 icon="📁"
-                label="Portfolio"
+                label="Portfolio PDF"
                 ariaLabel="포트폴리오 PDF 다운로드 또는 새 탭에서 열기"
                 className="download-btn-large"
                 onAfterClick={() => setMenuOpen(false)}

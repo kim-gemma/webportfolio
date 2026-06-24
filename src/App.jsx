@@ -11,6 +11,7 @@ import MailboxModal from "./components/MailboxModal";
 import MailboxHint from "./components/MailboxHint";
 import NpcAiHint from "./components/NpcAiHint";
 import FloatingActionArea from "./components/FloatingActionArea";
+import QuickNavigation from "./components/QuickNavigation";
 import { ChatProvider } from "./chat/context/ChatContext";
 import ChatModal from "./chat/components/ChatModal";
 import { NpcChatProvider, useNpcChat } from "./npcChat/context/NpcChatContext";
@@ -90,10 +91,16 @@ function GameContent() {
     currentScene?.movePlayerHome?.();
   }, [activeZone, mailboxModalOpen, currentScene, closeZone, closeMailboxModal]);
 
+  const handleZoneSelect = useCallback((zoneKey) => {
+    closeMailboxModal();
+    currentScene?.movePlayerToZone?.(zoneKey);
+    openZone(zoneKey);
+  }, [closeMailboxModal, currentScene, openZone]);
+
   return (
     <div className="app-shell">
       {gameStarted && (
-        <TopBar onHomeSelect={handleHomeSelect} onZoneSelect={openZone} />
+        <TopBar onHomeSelect={handleHomeSelect} onZoneSelect={handleZoneSelect} />
       )}
 
       <div className="game-stage" ref={gameContainerRef}>
@@ -102,6 +109,7 @@ function GameContent() {
         <ZoneHint isMobile={isMobile} />
         <MailboxHint isMobile={isMobile} />
         <NpcAiHint isMobile={isMobile} />
+        {gameStarted && <QuickNavigation onSelect={handleZoneSelect} />}
       </div>
 
       {isMobile && gameStarted && <VirtualJoystick onMove={handleJoystick} />}

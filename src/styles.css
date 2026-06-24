@@ -332,9 +332,9 @@ a:hover {
   border: 3px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 40px 36px;
-  max-width: 460px;
+  max-width: 760px;
   width: 100%;
-  text-align: center;
+  text-align: left;
   box-shadow: 0 0 0 6px rgba(244, 162, 89, 0.08), 0 20px 60px rgba(0,0,0,0.5);
 }
 
@@ -352,10 +352,16 @@ a:hover {
 
 .intro-title {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   margin: 0 0 12px;
   line-height: 1.5;
   color: var(--color-text);
+}
+
+.intro-name {
+  margin: 0 0 8px;
+  color: var(--color-text-dim);
+  font-weight: 700;
 }
 
 .intro-role {
@@ -370,6 +376,44 @@ a:hover {
   color: var(--color-text-dim);
   line-height: 1.7;
   margin: 0 0 28px;
+}
+
+.intro-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.intro-keywords span {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-panel-raised);
+  color: var(--color-teal);
+  padding: 7px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.intro-proof-grid {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 8px 12px;
+  margin: 0 0 24px;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(var(--color-panel-rgb), 0.58);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.intro-proof-grid strong {
+  color: var(--color-accent);
+}
+
+.intro-proof-grid span {
+  color: var(--color-text-dim);
 }
 
 .btn-primary {
@@ -397,13 +441,32 @@ a:hover {
 
 .intro-controls {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 4px;
   margin-top: 24px;
   padding-top: 18px;
   border-top: 1px dashed var(--color-border);
   font-size: 11px;
   color: var(--color-text-dim);
+}
+
+@media (max-width: 640px) {
+  .intro-screen {
+    align-items: flex-start;
+    overflow: auto;
+  }
+
+  .intro-card {
+    padding: 28px 22px;
+  }
+
+  .intro-title {
+    font-size: 19px;
+  }
+
+  .intro-proof-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ------------------------------------------------------------
@@ -727,6 +790,65 @@ a:hover {
   min-height: 0;
 }
 
+.quick-nav {
+  position: absolute;
+  right: 18px;
+  bottom: 84px;
+  z-index: 8;
+  width: min(320px, calc(100% - 36px));
+  background: rgba(var(--color-panel-rgb), 0.9);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  padding: 14px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.32);
+}
+
+.quick-nav-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+}
+
+.quick-nav-list {
+  display: grid;
+  gap: 6px;
+}
+
+.quick-nav-item {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  padding: 8px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.quick-nav-item:hover {
+  background: var(--color-panel-raised);
+  border-color: var(--color-border);
+}
+
+.quick-nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--quick-color);
+}
+
+@media (max-width: 768px) {
+  .quick-nav {
+    display: none;
+  }
+}
+
 .game-stage canvas {
   display: block;
   /* Phaser가 리사이즈마다 .game-stage 크기에 맞춰 인라인 px 크기를 다시 써주므로
@@ -886,7 +1008,7 @@ a:hover {
   border: 3px solid var(--color-border);
   border-top: 5px solid var(--zone-color, var(--color-accent));
   border-radius: var(--radius-lg);
-  max-width: 640px;
+  max-width: 920px;
   width: 100%;
   max-height: 84vh;
   overflow-y: auto;
@@ -910,6 +1032,27 @@ a:hover {
 }
 .modal-close:hover {
   background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.modal-top-button {
+  position: sticky;
+  bottom: 0;
+  float: right;
+  z-index: 2;
+  margin: 18px 0 0 12px;
+  border: 2px solid var(--zone-color, var(--color-accent));
+  border-radius: 8px;
+  background: var(--color-panel-raised);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+}
+
+.modal-top-button:hover {
+  background: var(--zone-color, var(--color-accent));
   color: var(--color-bg);
 }
 
@@ -1123,6 +1266,141 @@ a:hover {
 .project-link {
   font-size: 12px;
   font-weight: 600;
+}
+
+.project-detail-grid {
+  gap: 18px;
+}
+
+.project-detail-card {
+  padding: 22px;
+}
+
+.project-detail-sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.project-detail-section {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(var(--color-panel-rgb), 0.45);
+  padding: 12px;
+}
+
+.project-detail-section h3,
+.project-detail-section h4 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--color-accent);
+}
+
+.project-detail-section p {
+  margin: 0;
+  color: var(--color-text-dim);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.project-tags-compact {
+  margin-bottom: 0;
+}
+
+.project-detail-list,
+.interview-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-dim);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.architecture-inline {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0;
+  padding: 12px;
+  border-left: 4px solid var(--zone-color, var(--color-accent));
+  background: var(--color-panel);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.architecture-inline strong {
+  color: var(--color-teal);
+}
+
+.architecture-inline span {
+  color: var(--color-text-dim);
+  line-height: 1.6;
+}
+
+.interview-section {
+  margin-top: 12px;
+}
+
+.interview-list li {
+  margin-bottom: 4px;
+}
+
+.architecture-flow {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.architecture-step {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.architecture-node {
+  width: 100%;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-panel-raised);
+  padding: 14px;
+}
+
+.architecture-node-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.architecture-node strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.architecture-node p {
+  margin: 0;
+  color: var(--color-text-dim);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.architecture-arrow {
+  color: var(--color-teal);
+  font-family: var(--font-display);
+  font-size: 16px;
+}
+
+@media (max-width: 700px) {
+  .project-detail-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-panel {
+    padding: 24px 18px;
+  }
 }
 
 /* Contact */

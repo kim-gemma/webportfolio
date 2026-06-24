@@ -836,23 +836,23 @@ export class IntroScene extends Phaser.Scene {
       const h = this.scale.height;
       this.layout = {
         cx: this.scale.width / 2,
-        titleY: h * 0.28,
-        nameY: h * 0.345,
-        role1Y: h * 0.385,
-        role2Y: h * 0.415,
+        titleY: h * 0.20,
+        nameY: h * 0.295,
+        role1Y: h * 0.345,
+        role2Y: h * 0.392,
         playerStopX: this.scale.width / 2,
-        playerStopY: h * 0.52,
-        playY: h * 0.61,
-        captionY: h * 0.665,
+        playerStopY: h * 0.54,
+        playY: h * 0.66,
+        captionY: h * 0.72,
       };
     } else {
       const [cx] = this.toScreen(384, 0);
       this.layout = {
         cx,
-        titleY: this.toScreen(0, 85)[1],
-        nameY: this.toScreen(0, 125)[1],
-        role1Y: this.toScreen(0, 150)[1],
-        role2Y: this.toScreen(0, 170)[1],
+        titleY: this.toScreen(0, 70)[1],
+        nameY: this.toScreen(0, 122)[1],
+        role1Y: this.toScreen(0, 154)[1],
+        role2Y: this.toScreen(0, 182)[1],
         playerStopX: cx,
         playerStopY: this.toScreen(0, 320)[1],
         playY: this.toScreen(0, 395)[1],
@@ -862,8 +862,7 @@ export class IntroScene extends Phaser.Scene {
   }
 
   // ------------------------------------------------------------
-  // 타이틀: "Pixel Garden Portfolio" + 이름/직함 3줄이 순차적으로 페이드인
-  // 1) 로고(가장 크고 강조색) 2) 이름(중간 크기) 3) 직함 2줄(가장 작고 보조색)
+  // 타이틀: 채용 담당자가 5초 안에 경력 방향을 이해하도록 역할/경험/키워드를 먼저 보여준다.
   // ------------------------------------------------------------
   createTitleSequence() {
     const scale = this.introScale;
@@ -873,23 +872,21 @@ export class IntroScene extends Phaser.Scene {
     // 모바일은 introScale 자체가 작아서(가로폭 기준) 글자를 거기에 그대로 묶으면
     // 너무 작아진다. 화면 실제 크기를 기준으로 따로 크기를 정해, 배경 그림은
     // 작아도 UI는 "모바일 게임처럼" 크게 보이게 한다.
-    // 1) 로고: 가장 크고 강조색 — "게임 타이틀"답게
+    // 1) 타이틀: 게임명이 아니라 직무 포지셔닝을 가장 크게 노출한다.
     const titleFontPx = isMobile
-      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.072, 24, 32))
-      : 30 * scale;
-    // 2) 이름: 로고보다 분명히 작은 중간 크기 — "이름이 타이틀처럼 보이는" 문제 방지
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.048, 17, 23))
+      : 24 * scale;
+    // 2) 이름/경력: 타이틀보다 작지만 첫 화면 증거로 보이게 한다.
     const nameFontPx = isMobile
-      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.046, 16, 21))
-      : 19 * scale;
-    // 3) 직함 2줄: 가장 작고 흐린 보조색
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.04, 14, 18))
+      : 17 * scale;
+    // 3) 키워드/증거: 작지만 대비를 확보해 빠르게 스캔할 수 있게 한다.
     const roleFontPx = isMobile
-      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.034, 11, 14))
-      : 13 * scale;
+      ? Math.round(Phaser.Math.Clamp(this.scale.width * 0.03, 10, 13))
+      : 12 * scale;
 
-    // 좁은 화면에서는 한 줄로 그리면 화면 밖으로 넘치므로, 실제 렌더 폭을 측정해
-    // 넘칠 때만 "Pixel Garden\nPortfolio" 2줄로 바꾼다. 타이틀이 한 줄 더
-    // 늘어난 만큼 이름/직함/캐릭터/PLAY/캡션도 함께 아래로 밀어 겹치지 않게 한다.
-    const titleOneLine = "Pixel Garden Portfolio";
+    // 좁은 화면에서는 한 줄로 그리면 화면 밖으로 넘치므로, 실제 렌더 폭을 측정해 넘칠 때만 줄바꿈한다.
+    const titleOneLine = "Enterprise SaaS & AI Product Engineer";
     let titleText = titleOneLine;
     if (isMobile) {
       const measure = this.add.text(0, 0, titleOneLine, {
@@ -903,7 +900,7 @@ export class IntroScene extends Phaser.Scene {
       measure.destroy();
 
       if (needsWrap) {
-        titleText = "Pixel Garden\nPortfolio";
+        titleText = "Enterprise SaaS\n& AI Product Engineer";
         const extraGap = Math.round(titleLineHeight * 0.62);
         this.layout.nameY += extraGap;
         this.layout.role1Y += extraGap;
@@ -924,9 +921,17 @@ export class IntroScene extends Phaser.Scene {
         stroke: 5,
         letterSpacing: 2,
       },
-      { text: "Kim Hyunneung", y: nameY, fontSize: nameFontPx, color: "#ffffff", stroke: 3, letterSpacing: 0 },
-      { text: "Frontend Engineer", y: role1Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
-      { text: "Developer", y: role2Y, fontSize: roleFontPx, color: "#cfd6e6", stroke: 0, letterSpacing: 0 },
+      { text: "Frontend Engineer · 3+ Years Experience", y: nameY, fontSize: nameFontPx, color: "#ffffff", stroke: 3, letterSpacing: 0 },
+      { text: "React Native · Enterprise Collaboration · AI Productivity", y: role1Y, fontSize: roleFontPx, color: "#f2f6ff", stroke: 3, letterSpacing: 0 },
+      { text: "Real-time Communication · WebSocket", y: role2Y, fontSize: roleFontPx, color: "#9ee7e8", stroke: 3, letterSpacing: 0 },
+      {
+        text: "Duzon Bizon 3Y3M · ONE AI · Docs · Messenger · Video Conference",
+        y: role2Y + (isMobile ? 24 : 22 * scale),
+        fontSize: roleFontPx,
+        color: "#ffd86b",
+        stroke: 3,
+        letterSpacing: 0,
+      },
     ];
 
     this.introTitleTexts = lines.map(({ text, y, fontSize, color, stroke, letterSpacing }) => {
@@ -1098,7 +1103,7 @@ export class IntroScene extends Phaser.Scene {
   }
 
   playIntroBubbleSequence(onDone) {
-    const lines = ["안녕하세요 👋", "Welcome to my Portfolio", "Let's Explore!"];
+    const lines = ["Enterprise SaaS", "ONE AI · Collaboration", "Quick Nav로 바로 보기"];
     const lineMs = this.isMobile ? 800 : 950;
     const bubble = this.introBubble;
     const player = this.introPlayer;
@@ -1142,7 +1147,7 @@ export class IntroScene extends Phaser.Scene {
     const padY = isMobile ? 16 : 14 * scale;
 
     const label = this.add
-      .text(0, 0, "PLAY", {
+      .text(0, 0, "ENTER", {
         fontFamily: "monospace",
         fontSize: `${fontPx}px`,
         color: "#fff7e8",
@@ -1183,7 +1188,7 @@ export class IntroScene extends Phaser.Scene {
     container.setSize(w, h).setInteractive({ useHandCursor: true });
 
     // 모바일은 Enter 키가 없으므로 "Press Enter" 계열 문구를 절대 보여주지 않는다
-    const captionText = isMobile ? "Tap Play to Start" : "Press Click Play";
+    const captionText = isMobile ? "Tap to enter career gallery" : "Click to enter career gallery";
     const caption = this.add
       .text(cx, captionY, captionText, {
         fontFamily: "monospace",
@@ -1299,11 +1304,10 @@ export class IntroScene extends Phaser.Scene {
   // ------------------------------------------------------------
   runOpeningSequence() {
     this.playTitleSequence(() => {
+      this.showPlayButton();
       this.walkPlayerIn(() => {
         this.time.delayedCall(this.isMobile ? 250 : 400, () => {
-          this.playIntroBubbleSequence(() => {
-            this.showPlayButton();
-          });
+          this.playIntroBubbleSequence();
         });
       });
     });

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame } from "../context/GameContext";
 import { ZONE_META } from "../config/zonesConfig";
 import {
@@ -6,6 +6,7 @@ import {
   TechnologiesContent,
   CvContent,
   ProjectsContent,
+  ArchitectureContent,
   ContactContent,
 } from "./modals";
 
@@ -14,10 +15,14 @@ const MODAL_COMPONENTS = {
   technologies: TechnologiesContent,
   cv: CvContent,
   projects: ProjectsContent,
+  architecture: ArchitectureContent,
   contact: ContactContent,
 };
 
 export default function ZoneModal({ zoneKey, onClose }) {
+  const panelRef = useRef(null);
+  const [showTopButton, setShowTopButton] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code === "Escape") {
@@ -29,6 +34,23 @@ export default function ZoneModal({ zoneKey, onClose }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  useEffect(() => {
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const handleScroll = () => {
+      setShowTopButton(panel.scrollTop > 240);
+    };
+
+    handleScroll();
+    panel.addEventListener("scroll", handleScroll, { passive: true });
+    return () => panel.removeEventListener("scroll", handleScroll);
+  }, [zoneKey]);
+
+  const handleScrollTop = () => {
+    panelRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const ContentComponent = MODAL_COMPONENTS[zoneKey];
 
   if (!ContentComponent) {
@@ -39,6 +61,7 @@ export default function ZoneModal({ zoneKey, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-panel"
+        ref={panelRef}
         style={{ "--zone-color": ZONE_META[zoneKey].color }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -50,6 +73,16 @@ export default function ZoneModal({ zoneKey, onClose }) {
           ×
         </button>
         <ContentComponent />
+        {showTopButton && (
+          <button
+            type="button"
+            className="modal-top-button"
+            onClick={handleScrollTop}
+            aria-label="모달 맨 위로 이동"
+          >
+            TOP
+          </button>
+        )}
       </div>
     </div>
   );

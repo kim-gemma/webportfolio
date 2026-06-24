@@ -19,8 +19,8 @@ interface OnlineCountMessage {
 interface VisitorStatsMessage {
   type: "visitor_stats";
   onlineCount: number;
-  totalVisits: number;
-  todayVisits: number;
+  totalVisits: number | null;
+  todayVisits: number | null;
 }
 
 function isOnlineCountMessage(data: unknown): data is OnlineCountMessage {
@@ -38,7 +38,10 @@ function isVisitorStatsMessage(data: unknown): data is VisitorStatsMessage {
     data !== null &&
     (data as { type?: unknown }).type === "visitor_stats" &&
     typeof (data as { onlineCount?: unknown }).onlineCount === "number" &&
-    typeof (data as { totalVisits?: unknown }).totalVisits === "number"
+    (
+      typeof (data as { totalVisits?: unknown }).totalVisits === "number" ||
+      (data as { totalVisits?: unknown }).totalVisits === null
+    )
   );
 }
 
