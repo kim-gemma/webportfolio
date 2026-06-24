@@ -6,8 +6,10 @@ const WS_URL = `${API_BASE_URL.replace(/^http/, "ws")}/ws/visitors`;
 
 const MAX_RECONNECT_DELAY_MS = 10_000;
 const BASE_RECONNECT_DELAY_MS = 1_000;
+const INITIAL_CONNECT_DELAY_MS = 100;
 const LEGACY_TOTAL_VISITS_STORAGE_KEY = "portfolio_total_visits";
 const LEGACY_VISIT_COUNTED_SESSION_KEY = "portfolio_visit_counted";
+const VISITOR_ID_STORAGE_KEY = "portfolio_visitor_id";
 
 export type VisitorSocketStatus = "connecting" | "connected" | "disconnected";
 
@@ -45,6 +47,22 @@ function isVisitorStatsMessage(data: unknown): data is VisitorStatsMessage {
   );
 }
 
+function createVisitorId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getOrCreateVisitorId(): string {
+  const stored = localStorage.getItem(VISITOR_ID_STORAGE_KEY);
+  if (stored) return stored;
+
+  const visitorId = createVisitorId();
+  localStorage.setItem(VISITOR_ID_STORAGE_KEY, visitorId);
+  return visitorId;
+}
+
 export interface UseOnlineVisitorsResult {
   onlineCount: number | null;
   totalVisits: number | null;
@@ -61,6 +79,7 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const unmountedRef = useRef(false);
+  const intentionalCloseRef = useRef(false);
 
   useEffect(() => {
     localStorage.removeItem(LEGACY_TOTAL_VISITS_STORAGE_KEY);
@@ -70,14 +89,37 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
   useEffect(() => {
     unmountedRef.current = false;
 
+    function closeSocket(): void {
+      const socket = socketRef.current;
+      if (!socket) return;
+
+      intentionalCloseRef.current = true;
+      if (socket.readyState === WebSocket.OPEN) {
+        try {
+          socket.send(JSON.stringify({ type: "visitor_leave" }));
+        } catch {
+          // 페이지 종료 직전에는 send가 실패할 수 있으므로 close로 이어간다.
+        }
+        socket.close(1000, "visitor left");
+      } else if (socket.readyState === WebSocket.CONNECTING) {
+        socket.close();
+      }
+
+      socketRef.current = null;
+    }
+
     function connect(): void {
+      intentionalCloseRef.current = false;
       setStatus("connecting");
       setOnlineCount(null);
       setTotalVisits(null);
       if (import.meta.env.DEV) {
         console.info("[online-visitors] connecting:", WS_URL);
       }
-      const socket = new WebSocket(WS_URL);
+      const visitorId = getOrCreateVisitorId();
+      const socketUrl = new URL(WS_URL);
+      socketUrl.searchParams.set("visitorId", visitorId);
+      const socket = new WebSocket(socketUrl.toString());
       socketRef.current = socket;
 
       socket.onopen = () => {
@@ -102,6 +144,10 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
 
       socket.onclose = () => {
         if (unmountedRef.current) return;
+        if (intentionalCloseRef.current) {
+          setStatus("disconnected");
+          return;
+        }
         setStatus("disconnected");
         scheduleReconnect();
       };
@@ -118,12 +164,17 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
       reconnectTimeoutRef.current = setTimeout(connect, delay);
     }
 
-    connect();
+    const initialConnectTimeout = setTimeout(connect, INITIAL_CONNECT_DELAY_MS);
+    window.addEventListener("pagehide", closeSocket);
+    window.addEventListener("beforeunload", closeSocket);
 
     return () => {
       unmountedRef.current = true;
+      clearTimeout(initialConnectTimeout);
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      socketRef.current?.close();
+      window.removeEventListener("pagehide", closeSocket);
+      window.removeEventListener("beforeunload", closeSocket);
+      closeSocket();
     };
   }, []);
 

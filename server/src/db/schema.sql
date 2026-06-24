@@ -10,11 +10,13 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 CREATE TABLE IF NOT EXISTS visitor_sessions (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   session_id VARCHAR(64) NOT NULL UNIQUE,
+  visitor_id VARCHAR(64) NULL,
   ip_address VARCHAR(45) NULL,
   user_agent VARCHAR(512) NULL,
   connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   disconnected_at TIMESTAMP NULL,
   last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_visitor_sessions_visitor_id (visitor_id),
   INDEX idx_visitor_sessions_connected_at (connected_at),
   INDEX idx_visitor_sessions_last_seen_at (last_seen_at)
 );

@@ -9,6 +9,7 @@ export interface VisitorStats {
 
 export interface RecentVisitorSession {
   sessionId: string;
+  visitorId: string | null;
   ipAddress: string | null;
   userAgent: string | null;
   connectedAt: string;
@@ -30,6 +31,7 @@ interface CountRow extends RowDataPacket {
 
 interface VisitorSessionRow extends RowDataPacket {
   session_id: string;
+  visitor_id: string | null;
   ip_address: string | null;
   user_agent: string | null;
   connected_at: Date;
@@ -49,17 +51,29 @@ function toIsoString(value: Date): string {
   return value.toISOString();
 }
 
+const VISITOR_COUNT_KEY_SQL = `
+  COALESCE(
+    visitor_id,
+    NULLIF(CONCAT(COALESCE(ip_address, ''), '|', COALESCE(user_agent, '')), '|'),
+    session_id
+  )
+`;
+
 export async function recordVisitorConnect(input: {
   sessionId: string;
+  visitorId: string;
   ipAddress: string | null;
   userAgent: string | null;
   onlineCount: number;
 }): Promise<void> {
   await pool.query<ResultSetHeader>(
-    `INSERT INTO visitor_sessions (session_id, ip_address, user_agent)
-     VALUES (?, ?, ?)
-     ON DUPLICATE KEY UPDATE last_seen_at = CURRENT_TIMESTAMP, disconnected_at = NULL`,
-    [input.sessionId, input.ipAddress, input.userAgent]
+    `INSERT INTO visitor_sessions (session_id, visitor_id, ip_address, user_agent)
+     VALUES (?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+       visitor_id = VALUES(visitor_id),
+       last_seen_at = CURRENT_TIMESTAMP,
+       disconnected_at = NULL`,
+    [input.sessionId, input.visitorId, input.ipAddress, input.userAgent]
   );
   await insertVisitorEvent(input.sessionId, "connect", input.onlineCount);
 }
@@ -95,10 +109,12 @@ async function insertVisitorEvent(
 
 export async function getVisitorStats(onlineCount: number): Promise<VisitorStats> {
   const [[totalRow]] = await pool.query<CountRow[]>(
-    "SELECT COUNT(*) AS total FROM visitor_sessions"
+    `SELECT COUNT(DISTINCT ${VISITOR_COUNT_KEY_SQL}) AS total FROM visitor_sessions`
   );
   const [[todayRow]] = await pool.query<CountRow[]>(
-    "SELECT COUNT(*) AS total FROM visitor_sessions WHERE DATE(connected_at) = CURRENT_DATE()"
+    `SELECT COUNT(DISTINCT ${VISITOR_COUNT_KEY_SQL}) AS total
+     FROM visitor_sessions
+     WHERE DATE(connected_at) = CURRENT_DATE()`
   );
 
   return {
@@ -110,7 +126,7 @@ export async function getVisitorStats(onlineCount: number): Promise<VisitorStats
 
 export async function listRecentVisitorSessions(limit = 20): Promise<RecentVisitorSession[]> {
   const [rows] = await pool.query<VisitorSessionRow[]>(
-    `SELECT session_id, ip_address, user_agent, connected_at, disconnected_at, last_seen_at
+    `SELECT session_id, visitor_id, ip_address, user_agent, connected_at, disconnected_at, last_seen_at
      FROM visitor_sessions
      ORDER BY connected_at DESC
      LIMIT ?`,
@@ -119,6 +135,7 @@ export async function listRecentVisitorSessions(limit = 20): Promise<RecentVisit
 
   return rows.map((row) => ({
     sessionId: row.session_id,
+    visitorId: row.visitor_id,
     ipAddress: row.ip_address,
     userAgent: row.user_agent,
     connectedAt: toIsoString(row.connected_at),
