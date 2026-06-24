@@ -81,6 +81,9 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
 
     function connect(): void {
       setStatus("connecting");
+      if (import.meta.env.DEV) {
+        console.info("[online-visitors] connecting:", WS_URL);
+      }
       const socket = new WebSocket(WS_URL);
       socketRef.current = socket;
 

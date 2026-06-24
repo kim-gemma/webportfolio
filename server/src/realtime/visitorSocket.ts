@@ -24,7 +24,15 @@ export function getOnlineVisitorCount(): number {
 }
 
 async function broadcastVisitorStats(): Promise<void> {
-  const stats = await getVisitorStats(clients.size);
+  const stats = await getVisitorStats(clients.size).catch((err) => {
+    console.error("[visitorSocket] visitor stats 조회 실패:", err);
+    return {
+      onlineCount: clients.size,
+      totalVisits: clients.size,
+      todayVisits: clients.size,
+    };
+  });
+
   const payload = JSON.stringify({
     type: "visitor_stats",
     onlineCount: stats.onlineCount,
