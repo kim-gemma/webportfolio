@@ -6,6 +6,8 @@ const WS_URL = `${API_BASE_URL.replace(/^http/, "ws")}/ws/visitors`;
 
 const MAX_RECONNECT_DELAY_MS = 10_000;
 const BASE_RECONNECT_DELAY_MS = 1_000;
+const LEGACY_TOTAL_VISITS_STORAGE_KEY = "portfolio_total_visits";
+const LEGACY_VISIT_COUNTED_SESSION_KEY = "portfolio_visit_counted";
 
 export type VisitorSocketStatus = "connecting" | "connected" | "disconnected";
 
@@ -58,10 +60,17 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
   const unmountedRef = useRef(false);
 
   useEffect(() => {
+    localStorage.removeItem(LEGACY_TOTAL_VISITS_STORAGE_KEY);
+    sessionStorage.removeItem(LEGACY_VISIT_COUNTED_SESSION_KEY);
+  }, []);
+
+  useEffect(() => {
     unmountedRef.current = false;
 
     function connect(): void {
       setStatus("connecting");
+      setOnlineCount(null);
+      setTotalVisits(null);
       if (import.meta.env.DEV) {
         console.info("[online-visitors] connecting:", WS_URL);
       }
