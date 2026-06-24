@@ -51,13 +51,27 @@ function toIsoString(value: Date): string {
   return value.toISOString();
 }
 
-const VISITOR_COUNT_KEY_SQL = `
-  COALESCE(
-    visitor_id,
-    NULLIF(CONCAT(COALESCE(ip_address, ''), '|', COALESCE(user_agent, '')), '|'),
-    session_id
-  )
-`;
+/**
+ * 같은 visitor_id가 이 시간 안에 재접속하면 네트워크 끊김 등에 의한 "재연결"로 간주해
+ * 같은 방문으로 취급한다 (총 방문수를 올리지 않음). 이보다 오래 지나서 돌아오면 새 방문으로 집계한다.
+ */
+const RECONNECT_GRACE_MS = 60_000;
+
+interface LastSeenRow extends RowDataPacket {
+  last_seen_at: Date;
+}
+
+async function isReconnectWithinGraceWindow(visitorId: string): Promise<boolean> {
+  const [[row]] = await pool.query<LastSeenRow[]>(
+    `SELECT last_seen_at FROM visitor_sessions
+     WHERE visitor_id = ?
+     ORDER BY last_seen_at DESC
+     LIMIT 1`,
+    [visitorId]
+  );
+  if (!row) return false;
+  return Date.now() - row.last_seen_at.getTime() <= RECONNECT_GRACE_MS;
+}
 
 export async function recordVisitorConnect(input: {
   sessionId: string;
@@ -66,14 +80,16 @@ export async function recordVisitorConnect(input: {
   userAgent: string | null;
   onlineCount: number;
 }): Promise<void> {
+  const isNewVisit = !(await isReconnectWithinGraceWindow(input.visitorId));
+
   await pool.query<ResultSetHeader>(
-    `INSERT INTO visitor_sessions (session_id, visitor_id, ip_address, user_agent)
-     VALUES (?, ?, ?, ?)
+    `INSERT INTO visitor_sessions (session_id, visitor_id, ip_address, user_agent, is_new_visit)
+     VALUES (?, ?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE
        visitor_id = VALUES(visitor_id),
        last_seen_at = CURRENT_TIMESTAMP,
        disconnected_at = NULL`,
-    [input.sessionId, input.visitorId, input.ipAddress, input.userAgent]
+    [input.sessionId, input.visitorId, input.ipAddress, input.userAgent, isNewVisit ? 1 : 0]
   );
   await insertVisitorEvent(input.sessionId, "connect", input.onlineCount);
 }
@@ -109,12 +125,12 @@ async function insertVisitorEvent(
 
 export async function getVisitorStats(onlineCount: number): Promise<VisitorStats> {
   const [[totalRow]] = await pool.query<CountRow[]>(
-    `SELECT COUNT(DISTINCT ${VISITOR_COUNT_KEY_SQL}) AS total FROM visitor_sessions`
+    "SELECT COUNT(*) AS total FROM visitor_sessions WHERE is_new_visit = 1"
   );
   const [[todayRow]] = await pool.query<CountRow[]>(
-    `SELECT COUNT(DISTINCT ${VISITOR_COUNT_KEY_SQL}) AS total
+    `SELECT COUNT(*) AS total
      FROM visitor_sessions
-     WHERE DATE(connected_at) = CURRENT_DATE()`
+     WHERE is_new_visit = 1 AND DATE(connected_at) = CURRENT_DATE()`
   );
 
   return {

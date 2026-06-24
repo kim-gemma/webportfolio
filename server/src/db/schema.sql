@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS visitor_sessions (
   connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   disconnected_at TIMESTAMP NULL,
   last_seen_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_new_visit TINYINT(1) NOT NULL DEFAULT 1,
   INDEX idx_visitor_sessions_visitor_id (visitor_id),
   INDEX idx_visitor_sessions_connected_at (connected_at),
   INDEX idx_visitor_sessions_last_seen_at (last_seen_at)

@@ -22,6 +22,17 @@ async function ensureVisitorIdColumn() {
   }
 }
 
+async function ensureIsNewVisitColumn() {
+  const [columns] = await pool.query(
+    "SHOW COLUMNS FROM visitor_sessions LIKE 'is_new_visit'"
+  );
+  if (Array.isArray(columns) && columns.length === 0) {
+    await pool.query(
+      "ALTER TABLE visitor_sessions ADD COLUMN is_new_visit TINYINT(1) NOT NULL DEFAULT 1 AFTER last_seen_at"
+    );
+  }
+}
+
 async function migrate() {
   const statements = sql
     .split(";")
@@ -33,6 +44,7 @@ async function migrate() {
   }
 
   await ensureVisitorIdColumn();
+  await ensureIsNewVisitColumn();
 
   console.log("Migration complete: portfolio operation tables are ready.");
   await pool.end();
