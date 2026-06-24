@@ -3,7 +3,17 @@
 // 각 영역의 제목, 아이콘, 설명 등을 한 곳에서 관리합니다
 // ============================================================
 
-export const ZONE_META = {
+export type ZoneKey = "about" | "technologies" | "cv" | "projects" | "contact";
+
+export interface ZoneMeta {
+  key: ZoneKey;
+  title: string;
+  icon: string;
+  description: string;
+  color: string;
+}
+
+export const ZONE_META: Record<ZoneKey, ZoneMeta> = {
   about: {
     key: "about",
     title: "About Me",
@@ -41,10 +51,4 @@ export const ZONE_META = {
   },
 };
 
-export const ZONES = [
-  "about",
-  "technologies",
-  "cv",
-  "projects",
-  "contact",
-];
+export const ZONES: ZoneKey[] = ["about", "technologies", "cv", "projects", "contact"];

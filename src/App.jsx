@@ -15,6 +15,7 @@ import { ChatProvider } from "./chat/context/ChatContext";
 import ChatModal from "./chat/components/ChatModal";
 import { NpcChatProvider, useNpcChat } from "./npcChat/context/NpcChatContext";
 import NpcChatModal from "./npcChat/components/NpcChatModal";
+import AdminDashboard from "./components/admin/AdminDashboard";
 
 function GameContent() {
   const gameContainerRef = useRef(null);
@@ -121,6 +122,10 @@ function GameContent() {
 }
 
 export default function App() {
+  if (window.location.pathname === "/admin") {
+    return <AdminDashboard />;
+  }
+
   return (
     <ChatProvider>
       <NpcChatProvider>

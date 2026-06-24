@@ -8,6 +8,7 @@ import { corsOptions } from "./middleware/cors.js";
 import { healthRouter } from "./routes/health.js";
 import { contactRouter } from "./routes/contactRoutes.js";
 import { npcChatRouter } from "./routes/npcChatRoutes.js";
+import { adminRouter } from "./routes/adminRoutes.js";
 import { attachVisitorSocket } from "./realtime/visitorSocket.js";
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: true, legacyHe
 app.use(healthRouter);
 app.use(contactRouter);
 app.use(npcChatRouter);
+app.use(adminRouter);
 
 // WebSocket(/ws/visitors)이 같은 포트에서 업그레이드 요청을 받도록
 // express 앱을 직접 listen하지 않고 http.Server를 통해 감싼다.

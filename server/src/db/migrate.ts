@@ -7,8 +7,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const sql = readFileSync(join(__dirname, "schema.sql"), "utf-8");
 
 async function migrate() {
-  await pool.query(sql);
-  console.log("Migration complete: contact_messages table is ready.");
+  const statements = sql
+    .split(";")
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+
+  for (const statement of statements) {
+    await pool.query(statement);
+  }
+
+  console.log("Migration complete: portfolio operation tables are ready.");
   await pool.end();
 }
 

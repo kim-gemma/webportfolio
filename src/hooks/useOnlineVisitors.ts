@@ -17,12 +17,29 @@ interface OnlineCountMessage {
   count: number;
 }
 
+interface VisitorStatsMessage {
+  type: "visitor_stats";
+  onlineCount: number;
+  totalVisits: number;
+  todayVisits: number;
+}
+
 function isOnlineCountMessage(data: unknown): data is OnlineCountMessage {
   return (
     typeof data === "object" &&
     data !== null &&
     (data as { type?: unknown }).type === "online_count" &&
     typeof (data as { count?: unknown }).count === "number"
+  );
+}
+
+function isVisitorStatsMessage(data: unknown): data is VisitorStatsMessage {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    (data as { type?: unknown }).type === "visitor_stats" &&
+    typeof (data as { onlineCount?: unknown }).onlineCount === "number" &&
+    typeof (data as { totalVisits?: unknown }).totalVisits === "number"
   );
 }
 
@@ -76,7 +93,10 @@ export function useOnlineVisitors(): UseOnlineVisitorsResult {
       socket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (isOnlineCountMessage(data)) {
+          if (isVisitorStatsMessage(data)) {
+            setOnlineCount(data.onlineCount);
+            setTotalVisits(data.totalVisits);
+          } else if (isOnlineCountMessage(data)) {
             setOnlineCount(data.count);
           }
         } catch {

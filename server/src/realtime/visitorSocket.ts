@@ -1,23 +1,56 @@
-import type { Server as HttpServer } from "node:http";
+import type { IncomingMessage, Server as HttpServer } from "node:http";
+import { randomUUID } from "node:crypto";
 import { WebSocketServer, WebSocket } from "ws";
 import { env } from "../config/env.js";
+import {
+  getVisitorStats,
+  recordVisitorConnect,
+  recordVisitorDisconnect,
+  recordVisitorHeartbeat,
+} from "../db/visitorRepository.js";
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
 
 interface VisitorSocket extends WebSocket {
   isAlive?: boolean;
+  sessionId?: string;
 }
 
 /** 현재 접속 중인 모든 클라이언트. Set이라 추가/삭제/size 조회가 모두 O(1)이다. */
 const clients = new Set<VisitorSocket>();
 
-function broadcastOnlineCount(): void {
-  const payload = JSON.stringify({ type: "online_count", count: clients.size });
+export function getOnlineVisitorCount(): number {
+  return clients.size;
+}
+
+async function broadcastVisitorStats(): Promise<void> {
+  const stats = await getVisitorStats(clients.size);
+  const payload = JSON.stringify({
+    type: "visitor_stats",
+    onlineCount: stats.onlineCount,
+    totalVisits: stats.totalVisits,
+    todayVisits: stats.todayVisits,
+  });
+
   for (const client of clients) {
     if (client.readyState === WebSocket.OPEN) {
       client.send(payload);
     }
   }
+}
+
+function broadcastVisitorStatsSafely(): void {
+  broadcastVisitorStats().catch((err) => {
+    console.error("[visitorSocket] failed to broadcast visitor stats:", err);
+  });
+}
+
+function getClientIp(req: IncomingMessage): string | null {
+  const forwardedFor = req?.headers?.["x-forwarded-for"];
+  if (typeof forwardedFor === "string" && forwardedFor.trim()) {
+    return forwardedFor.split(",")[0]?.trim() ?? null;
+  }
+  return req?.socket?.remoteAddress ?? null;
 }
 
 /**
@@ -38,16 +71,36 @@ export function attachVisitorSocket(server: HttpServer): WebSocketServer {
     }
 
     ws.isAlive = true;
+    ws.sessionId = randomUUID();
     ws.on("pong", () => {
       ws.isAlive = true;
+      if (ws.sessionId) {
+        recordVisitorHeartbeat(ws.sessionId, clients.size).catch((err) => {
+          console.error("[visitorSocket] heartbeat 기록 실패:", err);
+        });
+      }
     });
 
     clients.add(ws);
-    broadcastOnlineCount();
+    recordVisitorConnect({
+      sessionId: ws.sessionId,
+      ipAddress: getClientIp(req),
+      userAgent: req.headers["user-agent"]?.slice(0, 512) ?? null,
+      onlineCount: clients.size,
+    })
+      .catch((err) => {
+        console.error("[visitorSocket] 접속 기록 실패:", err);
+      })
+      .finally(broadcastVisitorStatsSafely);
 
     ws.on("close", () => {
       clients.delete(ws);
-      broadcastOnlineCount();
+      if (ws.sessionId) {
+        recordVisitorDisconnect(ws.sessionId, clients.size).catch((err) => {
+          console.error("[visitorSocket] 종료 기록 실패:", err);
+        });
+      }
+      broadcastVisitorStatsSafely();
     });
 
     ws.on("error", (err) => {
@@ -55,6 +108,7 @@ export function attachVisitorSocket(server: HttpServer): WebSocketServer {
       // ws 라이브러리는 error 이후 보통 close도 내보내지만, 혹시 close가 누락되는
       // 경우를 대비해 여기서도 명시적으로 정리한다 (Set.delete는 이미 없으면 무해함).
       clients.delete(ws);
+      broadcastVisitorStatsSafely();
     });
   });
 

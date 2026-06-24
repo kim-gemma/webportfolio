@@ -5,7 +5,7 @@ import DownloadButton from "./DownloadButton";
 import ThemeToggle from "./ThemeToggle";
 import { RESUME_FILE, PORTFOLIO_FILE } from "../utils/fileDownload";
 
-const TOP_BAR_LABELS = {
+const TOP_BAR_LABELS: Record<string, string> = {
   about: "About",
   technologies: "Skills",
   cv: "CV",
@@ -13,11 +13,23 @@ const TOP_BAR_LABELS = {
   contact: "Contact",
 };
 
-export default function TopBar({ onHomeSelect, onZoneSelect }) {
+export interface TopBarProps {
+  /** "HOME" 텍스트를 클릭하거나 키보드로 선택했을 때 호출된다 (플레이어를 홈 위치로 이동) */
+  onHomeSelect: () => void;
+  /** 데스크톱 가로 메뉴 또는 모바일 메뉴에서 zone 버튼을 클릭했을 때 호출된다 */
+  onZoneSelect: (zoneKey: string) => void;
+}
+
+/**
+ * 화면 상단 고정 내비게이션 바. 데스크톱에서는 가로 메뉴 + 다운로드 버튼을, 768px 이하
+ * 모바일에서는 햄버거 메뉴로 전환해 보여준다. `useGame()`의 `hintZone`/`activeZone`을
+ * 구독해 현재 가까이 있거나 들어가 있는 zone의 메뉴 항목을 강조(active)한다.
+ */
+export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
   const { hintZone, activeZone } = useGame();
   const highlighted = activeZone || hintZone;
   const [menuOpen, setMenuOpen] = useState(false);
-  const headerRef = useRef(null);
+  const headerRef = useRef<HTMLHeadElement>(null);
 
   // 실제 렌더링된 TopBar 높이를 CSS 변수로 노출해 Online Visitors Badge 등
   // 떠 있는 UI가 TopBar 높이(safe-area, 햄버거 버튼 크기 등에 따라 가변적)에
@@ -37,7 +49,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
   // 모바일 메뉴가 열려 있을 때 ESC로 닫을 수 있게 한다
   useEffect(() => {
     if (!menuOpen) return;
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === "Escape") setMenuOpen(false);
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -49,14 +61,14 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
     onHomeSelect();
   };
 
-  const handleHomeKeyDown = (e) => {
+  const handleHomeKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleHomeClick();
     }
   };
 
-  const handleZoneClick = (zoneKey) => {
+  const handleZoneClick = (zoneKey: string) => {
     onZoneSelect(zoneKey);
     setMenuOpen(false);
   };
@@ -66,7 +78,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }) {
       <button
         key={zoneKey}
         className={`top-bar-link${extraClassName ? ` ${extraClassName}` : ""}${highlighted === zoneKey ? " active" : ""}`}
-        style={highlighted === zoneKey ? { "--zone-color": ZONE_META[zoneKey].color } : undefined}
+        style={highlighted === zoneKey ? ({ "--zone-color": ZONE_META[zoneKey].color } as React.CSSProperties) : undefined}
         onClick={() => handleZoneClick(zoneKey)}
       >
         <span className="top-bar-link-icon">{ZONE_META[zoneKey].icon}</span>

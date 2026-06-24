@@ -1,4 +1,4 @@
-import type { ResultSetHeader } from "mysql2";
+import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import { pool } from "./pool.js";
 
 export interface ContactMessageRecord {
@@ -7,6 +7,22 @@ export interface ContactMessageRecord {
   email: string | null;
   message: string;
   createdAt: Date;
+}
+
+export interface ContactMessageListItem {
+  id: number;
+  name: string;
+  email: string | null;
+  message: string;
+  createdAt: string;
+}
+
+interface ContactMessageRow extends RowDataPacket {
+  id: number;
+  name: string;
+  email: string | null;
+  message: string;
+  created_at: Date;
 }
 
 /**
@@ -30,4 +46,22 @@ export async function insertContactMessage(
     message,
     createdAt: new Date(),
   };
+}
+
+export async function listContactMessages(limit = 50): Promise<ContactMessageListItem[]> {
+  const [rows] = await pool.query<ContactMessageRow[]>(
+    `SELECT id, name, email, message, created_at
+     FROM contact_messages
+     ORDER BY created_at DESC
+     LIMIT ?`,
+    [limit]
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    message: row.message,
+    createdAt: row.created_at.toISOString(),
+  }));
 }

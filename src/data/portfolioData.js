@@ -5,9 +5,9 @@
 export const PORTFOLIO_DATA = {
   profile: {
     name: "김현능",
-    role: "React Native Enterprise Mobile Frontend Engineer",
+    role: "Enterprise Collaboration & AI Productivity Frontend Engineer",
     tagline:
-      "웹 퍼블리싱에서 시작해 React Native 엔터프라이즈 모바일 개발자로 성장했습니다. AI 기능 연동, WebView-Native Bridge, 기업용 SaaS 보안 요구사항까지 고려한 서비스를 만듭니다.",
+      "기업용 협업 플랫폼과 AI 생산성 서비스를 개발하는 프론트엔드 엔지니어입니다. 전자결재, 문서관리, 메신저, 화상회의, AI 회의록·OCR·STT 등 업무 흐름을 모바일에서도 끊김 없이 사용할 수 있도록 만듭니다.",
     location: "서울, 대한민국",
     yearsExperience: "3년 8개월",
     email: "ayuhyun@naver.com",
@@ -17,16 +17,48 @@ export const PORTFOLIO_DATA = {
   },
 
   about: {
-    headline: "웹 퍼블리싱에서 시작해 React · React Native 기반 엔터프라이즈 서비스와 AI 기능을 개발하는 Frontend Engineer",
+    headline: "기업용 협업 플랫폼과 AI 생산성 서비스를 개발하는 Frontend Engineer",
     paragraphs: [
-      "웹 퍼블리싱 기반 UI 역량에서 시작해 React Native 엔터프라이즈 모바일 개발자로 성장했습니다. 더존비즈온에서 3년 3개월간 기업용 SaaS 모바일 플랫폼을 신규 개발하며 WebView-Native Bridge 고도화와 Android/iOS 플랫폼 이슈 대응을 도맡았습니다.",
-      "AI Chat UI와 STT(음성-텍스트 변환), WebSocket 기반 실시간 인터페이스를 직접 설계하고 구현했습니다. Context API, Redux, Zustand 등 상황에 맞는 상태 관리 전략을 선택해 복잡한 데이터 흐름을 안정적으로 풀어내는 것을 중요하게 생각합니다.",
-      "최근에는 Spring Boot, MySQL, Docker, AWS 기반의 백엔드/클라우드 구조를 직접 학습하며 서비스 전체 아키텍처를 이해하는 풀스택 시야를 넓히고 있습니다.",
-      "이 포트폴리오 자체도 하나의 실험 공간으로 운영하고 있습니다. Storybook으로 공통 UI 컴포넌트를 문서화하고 Design Token 기반 디자인 시스템을 구축해 다크 모드와 반응형 UI를 일관되게 관리했고, OpenAI·Gemini 기반 AI Portfolio Assistant와 WebSocket 기반 실시간 방문자 표시 기능을 직접 구현했습니다. 방문자 문의는 Discord Webhook으로 알림을 받도록 연동해, 운영까지 고려한 서비스 흐름을 경험해보고 있습니다.",
+      "더존비즈온에서 3년 3개월간 기업용 협업 플랫폼의 모바일 서비스를 개발했습니다. 전자결재, 문서관리, 메신저, 화상회의, 조직도 기반 커뮤니케이션처럼 기업 사용자가 매일 사용하는 업무 기능을 모바일 환경에서도 안정적으로 처리할 수 있도록 구현했습니다.",
+      "AI 회의록, OCR, STT, AI Chat UI 등 업무 생산성을 높이는 기능을 서비스 흐름 안에 통합했습니다. 단순히 AI API를 연결하는 데서 그치지 않고, 사용자가 회의 내용을 빠르게 정리하고 문서를 더 쉽게 탐색하며 음성 입력으로 업무를 이어갈 수 있는 경험을 만드는 데 집중했습니다.",
+      "엔터프라이즈 SaaS 환경에서 권한 관리, 인증, 보안 요구사항, Android/iOS 플랫폼 차이, WebView-Native Bridge 같은 복잡한 제약을 다뤘습니다. Context API, Redux, Zustand 등 상태 관리 도구는 기술 자체보다 전자결재·문서·메신저·AI 응답처럼 서로 다른 업무 흐름을 안정적으로 연결하기 위한 수단으로 활용했습니다.",
+      "최근에는 Spring Boot, MySQL, Docker, AWS 기반의 백엔드/클라우드 구조를 학습하며 프론트엔드 너머의 서비스 아키텍처 이해를 넓히고 있습니다. 이 포트폴리오에도 AI Portfolio Assistant, 실시간 방문자 표시, Discord 알림, 디자인 시스템을 직접 구성해 운영까지 고려한 서비스 흐름을 실험하고 있습니다.",
     ],
   },
 
   skills: [
+    {
+      id: "enterprise-collaboration",
+      name: "Enterprise Collaboration",
+      category: "Domain",
+      level: 5,
+      description:
+        "전자결재, 메신저, 화상회의, 조직도 기반 커뮤니케이션 등 기업 구성원이 매일 사용하는 협업 기능을 모바일 업무 흐름에 맞게 개발했습니다.",
+    },
+    {
+      id: "document-management",
+      name: "Document Management",
+      category: "Domain",
+      level: 5,
+      description:
+        "기업 문서의 등록, 업로드, 조회, 권한 기반 접근 흐름을 다뤘으며, 대용량 문서를 모바일에서도 안정적으로 처리할 수 있도록 사용자 경험을 개선했습니다.",
+    },
+    {
+      id: "ai-productivity",
+      name: "AI Productivity",
+      category: "Domain",
+      level: 4,
+      description:
+        "AI 회의록, OCR, STT, AI Chat UI를 업무 서비스에 통합해 회의 정리, 문서 분석, 음성 입력 같은 반복 업무를 더 빠르게 처리할 수 있도록 구현했습니다.",
+    },
+    {
+      id: "enterprise-saas",
+      name: "Enterprise SaaS",
+      category: "Domain",
+      level: 4,
+      description:
+        "기업 환경의 인증, 권한 관리, 보안 요구사항, 플랫폼별 제약을 고려해 실제 업무 시스템에 필요한 안정성과 일관성을 갖춘 화면을 개발했습니다.",
+    },
     {
       id: "react",
       name: "React",
@@ -57,7 +89,7 @@ export const PORTFOLIO_DATA = {
       category: "Mobile",
       level: 5,
       description:
-        "3년 이상 엔터프라이즈 모바일 앱을 개발하며 플랫폼 특성을 고려한 UI 구현 및 성능 최적화를 경험했습니다.",
+        "3년 이상 기업용 협업 플랫폼 모바일 서비스를 개발하며 전자결재, 문서관리, 메신저, 화상회의 등 PC 중심 업무 기능을 모바일 경험으로 확장했습니다.",
     },
     {
       id: "state-api",
@@ -73,7 +105,7 @@ export const PORTFOLIO_DATA = {
       category: "Communication",
       level: 4,
       description:
-        "REST API 기반 CRUD 기능 개발과 WebSocket을 활용한 실시간 데이터 통신 기능을 구현했습니다. 프론트엔드와 백엔드 간 데이터 흐름을 설계하고 관리했습니다.",
+        "문서·협업·AI 응답 흐름에 필요한 API 연동과 실시간 통신을 구현했습니다. 사용자가 더 빠르게 업무를 처리할 수 있도록 AI 응답, 상태 변경, 데이터 흐름을 안정적으로 연결했습니다.",
     },
     {
       id: "webview-bridge",
@@ -81,7 +113,7 @@ export const PORTFOLIO_DATA = {
       category: "Mobile",
       level: 5,
       description:
-        "WebView와 Native 모듈 간 양방향 통신을 구현하여 Android/iOS 플랫폼별 이슈를 해결했습니다.",
+        "기업 사용자가 모바일 환경에서도 PC와 유사한 업무 경험을 할 수 있도록 WebView와 Native 모듈 간 양방향 통신을 구현하고 Android/iOS 플랫폼별 이슈를 해결했습니다.",
     },
     {
       id: "ai-integration",
@@ -89,7 +121,7 @@ export const PORTFOLIO_DATA = {
       category: "Feature",
       level: 4,
       description:
-        "AI Chat UI, STT, OCR, 스트리밍 응답 처리 등 생성형 AI 기반 기능을 프론트엔드에 통합했습니다.",
+        "AI Chat UI, STT, OCR, 스트리밍 응답 처리를 업무 서비스에 통합해 회의록 작성, 문서 분석, 음성 입력 등 사용자의 반복 업무를 줄이는 기능을 개발했습니다.",
     },
     {
       id: "backend-cloud",
@@ -145,12 +177,13 @@ export const PORTFOLIO_DATA = {
       company: "더존비즈온",
       role: "React Native Engineer · Frontend Engineer (3년 3개월)",
       summary:
-        "기업용 SaaS 모바일 플랫폼을 신규 개발하며 WebView-Native Bridge 고도화, Native 모듈 연동, AI Chat UI·STT·WebSocket 실시간 인터페이스 개발을 담당했습니다.",
+        "기업용 협업 플랫폼 모바일 서비스를 개발하며 전자결재, 문서관리, 메신저, 화상회의, 조직도 기반 협업, AI 생산성 기능을 모바일 업무 경험으로 연결했습니다.",
       highlights: [
-        "기업용 SaaS 모바일 플랫폼 신규 개발",
-        "WebView-Native Bridge 고도화 및 Native 모듈 연동",
-        "Android/iOS 플랫폼 이슈 해결 및 대응",
-        "AI Chat UI, STT, WebSocket 실시간 인터페이스 개발",
+        "전자결재, 문서관리, 메신저, 화상회의 등 기업용 협업 플랫폼 모바일 서비스 개발",
+        "조직도 기반 사용자 탐색, 참여자 초대, 커뮤니케이션 흐름 등 협업 기능 구현",
+        "AI 회의록, OCR, STT, AI Chat UI 등 업무 생산성 기능 개발",
+        "기업 환경의 인증, 권한 관리, 보안 요구사항에 맞춘 모바일 서비스 대응",
+        "WebView-Native Bridge와 Native 모듈 연동으로 PC 업무 기능을 모바일 경험으로 확장",
       ],
     },
     {
@@ -183,39 +216,39 @@ export const PORTFOLIO_DATA = {
   projects: [
     {
       id: "proj-one-ai-mobile",
-      name: "ONE AI Mobile — AI Chat UI & STT Integration",
+      name: "ONE AI Mobile — AI 업무 생산성 서비스",
       description:
-        "AI 기반 문서 분석 및 음성 인터페이스 엔터프라이즈 모바일 서비스. WebSocket 실시간 통신으로 응답 지연을 개선하고, STT 상태를 독립 Custom Hook으로 분리해 음성 입력 중 UI 충돌을 제거했습니다.",
-      tags: ["React Native", "WebSocket", "OpenAI", "Gemini"],
+        "기업 사용자가 문서 분석, 음성 입력, AI 응답을 모바일에서 빠르게 활용할 수 있도록 만든 AI 생산성 서비스입니다. 실시간 AI 응답 환경과 안정적인 STT 상태 관리를 통해 회의·문서 업무 중 발생하는 대기 시간과 입력 불편을 줄였습니다.",
+      tags: ["AI Productivity", "React Native", "STT", "Real-time AI"],
       link: null,
     },
     {
       id: "proj-onechamber",
-      name: "Mobile OneChamber — 대용량 문서 관리",
+      name: "Mobile OneChamber — 기업 문서관리 모바일 서비스",
       description:
-        "100MB+ 대용량 파일 업로드를 다루는 엔터프라이즈 문서 관리 모바일 서비스. 청크 단위 전송과 자동 재연결 로직으로 업로드 안정성을 확보하고, Context+Reducer로 API/UI 상태를 분리했습니다.",
-      tags: ["React Native", "TypeScript", "Context API", "REST API"],
+        "기업 사용자가 대용량 문서를 모바일에서도 안정적으로 등록·관리할 수 있도록 지원한 문서관리 서비스입니다. 100MB 이상 파일 업로드 과정의 실패 가능성을 줄이고, 문서 처리 상태를 명확히 분리해 업무 중단 없이 문서 업무를 이어갈 수 있게 했습니다.",
+      tags: ["Document Management", "Enterprise SaaS", "React Native", "REST API"],
       link: null,
     },
     {
       id: "proj-oneffice",
-      name: "ONEFFICE Mobile — CSAP 보안 대응",
+      name: "ONEFFICE Mobile — 모바일 업무 환경 확장",
       description:
-        "더존비즈온 기업용 협업·문서 관리 모바일 서비스. WebView-Native Bridge 메시지 프로토콜을 정의하고, JWT 인증 및 RBAC 권한 제어로 CSAP 보안 요구사항에 대응했습니다.",
-      tags: ["React Native", "WebView", "JWT", "RBAC"],
+        "기업 사용자가 모바일 환경에서도 PC와 동일한 문서·협업 업무를 수행할 수 있도록 지원한 모바일 서비스입니다. WebView-Native Bridge, 인증, 권한 제어를 통해 기존 업무 시스템을 모바일로 확장하면서 기업 보안 요구사항에 대응했습니다.",
+      tags: ["Mobile Enterprise Platform", "WebView", "RBAC", "Enterprise Security"],
       link: null,
     },
     {
       id: "proj-amaranth-chat",
       name: "Amaranth10 Messenger & Video Conference",
       description:
-        "기업용 메신저 및 화상회의 모바일 서비스 개발. 조직도 기반 참여자 초대, 채팅방 관리, 화상회의 입장 프로세스, AI 회의록 연동 기능을 구현했으며 공통 댓글 및 커뮤니케이션 기능을 모바일 환경에 최적화했습니다.",
+        "조직도 기반 협업이 필요한 기업 사용자를 위해 메신저와 화상회의 모바일 경험을 개발했습니다. 조직도 기반 참여자 초대, 채팅방 관리, 회의 입장 흐름, AI 회의록 연동을 통해 커뮤니케이션과 회의 기록이 하나의 업무 흐름 안에서 이어지도록 구성했습니다.",
       tags: [
+        "Enterprise Collaboration",
+        "Business Productivity",
+        "Video Conference",
+        "AI Meeting Notes",
         "React Native",
-        "React",
-        "REST API",
-        "WebRTC",
-        "Enterprise Collaboration"
       ],
       link: null,
     },
@@ -223,7 +256,7 @@ export const PORTFOLIO_DATA = {
       id: "proj-whatflix",
       name: "WhatFlix",
       description:
-        "React + Spring Boot 풀스택 개인 프로젝트. Custom Hook으로 외부 API 연동을 추상화하고, IntersectionObserver 기반 무한 스크롤과 React.memo 렌더링 최적화, Kakao OAuth 인증을 구현했습니다.",
+        "사용자가 콘텐츠를 더 쉽게 탐색하고 개인화된 추천 흐름을 경험할 수 있도록 만든 React + Spring Boot 풀스택 프로젝트입니다. 외부 API 연동, 무한 스크롤, Kakao OAuth 인증을 통해 실제 서비스형 탐색 경험을 구성했습니다.",
       tags: ["React", "Context API", "Spring Boot", "Kakao OAuth"],
       link: null,
     },
@@ -231,7 +264,7 @@ export const PORTFOLIO_DATA = {
       id: "proj-web-builder",
       name: "Web Builder Template Frontend",
       description:
-        "템플릿 플랫폼의 UI와 공통 컴포넌트를 개발했습니다. 컴포넌트 아키텍처를 모듈화하고 CSS Grid/Flexbox로 반응형 설계를 적용해 신규 템플릿 개발 생산성을 높였습니다.",
+        "템플릿 제작자가 반복 UI를 더 빠르게 구성할 수 있도록 공통 컴포넌트와 반응형 레이아웃을 정리한 프로젝트입니다. 모듈화된 컴포넌트 구조로 신규 템플릿 제작 시간을 줄이고 유지보수성을 높였습니다.",
       tags: ["React", "TypeScript", "HTML/CSS"],
       link: null,
     },
@@ -239,7 +272,7 @@ export const PORTFOLIO_DATA = {
       id: "proj-doggyforest",
       name: "강아지숲 반응형 웹 전환",
       description:
-        "PC 중심 화면을 Mobile-first 레이아웃으로 전환했습니다. 재사용 가능한 컴포넌트 구조와 시맨틱 마크업·ARIA 적용으로 모바일 사용성과 접근성을 함께 개선했습니다.",
+        "PC 중심으로 제공되던 웹 경험을 모바일 사용자도 자연스럽게 이용할 수 있도록 Mobile-first 구조로 전환했습니다. 재사용 가능한 컴포넌트와 시맨틱 마크업·ARIA 적용으로 사용성과 접근성을 함께 개선했습니다.",
       tags: ["React", "TypeScript", "Responsive Web"],
       link: null,
     },
@@ -247,7 +280,7 @@ export const PORTFOLIO_DATA = {
       id: "proj-design-system",
       name: "Design System & Storybook",
       description:
-        "포트폴리오 전반에서 사용하는 공통 UI 컴포넌트와 Design Token 시스템을 구축한 프로젝트입니다. Storybook을 통해 버튼, 모달, 카드, 다크 모드 UI 등 주요 컴포넌트를 문서화하고 상태별 UI를 독립적으로 검증할 수 있도록 구성했습니다.",
+        "화면이 늘어날수록 UI 품질이 흔들리지 않도록 공통 컴포넌트와 Design Token을 정리한 프로젝트입니다. Storybook으로 상태별 UI를 문서화해 반복 개발 과정에서도 일관된 사용자 경험을 유지할 수 있게 했습니다.",
       tags: ["React", "TypeScript", "Storybook", "Design System"],
       link: null,
     },
@@ -255,10 +288,14 @@ export const PORTFOLIO_DATA = {
       id: "proj-garden-portfolio",
       name: "코드 정원 포트폴리오",
       description:
-        "React, Phaser.js, TypeScript 기반 게임형 인터랙티브 포트폴리오입니다. 캐릭터가 맵을 탐험하며 정보를 발견하는 인터랙션 위에, Storybook 기반 컴포넌트 문서화와 Design Token 디자인 시스템, OpenAI/Gemini 기반 AI Portfolio Assistant, WebSocket 실시간 방문자 기능, Discord Webhook 알림까지 더해 하나의 서비스에 가깝게 구성했습니다.",
-      tags: ["React", "TypeScript", "Phaser.js", "Storybook", "WebSocket", "AI"],
+        "면접관이 이력서를 순서대로 읽는 대신 직접 탐색하며 경험을 확인할 수 있도록 만든 인터랙티브 포트폴리오입니다. AI Portfolio Assistant, 실시간 방문자 표시, 문의 알림, 디자인 시스템을 연결해 단순 소개 페이지가 아니라 운영 가능한 작은 서비스처럼 구성했습니다.",
+      tags: ["React", "TypeScript", "Phaser.js", "AI Productivity", "WebSocket" ,],
       achievements: [
         "Storybook 기반 UI 컴포넌트 문서화",
+        "AWS S3 + CloudFront 기반 프론트엔드 배포",
+        "AWS EC2 + Nginx + PM2 기반 서버 운영",
+        "AWS RDS 기반 문의 및 방문자 데이터 저장",
+        "AWS CloudWatch 기반 로그 모니터링 환경 구축",
         "Design Token 기반 디자인 시스템 구축",
         "OpenAI·Gemini 기반 AI Portfolio Assistant 구현",
         "WebSocket 실시간 방문자 기능 구현",
