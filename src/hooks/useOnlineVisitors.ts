@@ -4,9 +4,6 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "https://webportfolio-cv10.onrender.com";
 const WS_URL = `${API_BASE_URL.replace(/^http/, "ws")}/ws/visitors`;
 
-const TOTAL_VISITS_STORAGE_KEY = "portfolio_total_visits";
-const VISIT_COUNTED_SESSION_KEY = "portfolio_visit_counted";
-
 const MAX_RECONNECT_DELAY_MS = 10_000;
 const BASE_RECONNECT_DELAY_MS = 1_000;
 
@@ -44,37 +41,21 @@ function isVisitorStatsMessage(data: unknown): data is VisitorStatsMessage {
 }
 
 export interface UseOnlineVisitorsResult {
-  onlineCount: number;
-  totalVisits: number;
+  onlineCount: number | null;
+  totalVisits: number | null;
   status: VisitorSocketStatus;
 }
 
 /** /ws/visitors에 연결해 실시간 접속자 수를 받아오고, 끊기면 지수 백오프로 재연결한다. */
 export function useOnlineVisitors(): UseOnlineVisitorsResult {
-  const [onlineCount, setOnlineCount] = useState(0);
-  const [totalVisits, setTotalVisits] = useState(0);
+  const [onlineCount, setOnlineCount] = useState<number | null>(null);
+  const [totalVisits, setTotalVisits] = useState<number | null>(null);
   const [status, setStatus] = useState<VisitorSocketStatus>("connecting");
 
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const unmountedRef = useRef(false);
-
-  useEffect(() => {
-    // 새로고침해도 누적되도록 localStorage에 저장하되, 같은 탭에서
-    // 리렌더/StrictMode로 두 번 세는 것을 막기 위해 세션당 1회만 증가시킨다.
-    const alreadyCountedThisSession = sessionStorage.getItem(VISIT_COUNTED_SESSION_KEY);
-    const stored = Number(localStorage.getItem(TOTAL_VISITS_STORAGE_KEY) ?? "0");
-
-    if (alreadyCountedThisSession) {
-      setTotalVisits(stored);
-    } else {
-      const next = stored + 1;
-      localStorage.setItem(TOTAL_VISITS_STORAGE_KEY, String(next));
-      sessionStorage.setItem(VISIT_COUNTED_SESSION_KEY, "1");
-      setTotalVisits(next);
-    }
-  }, []);
 
   useEffect(() => {
     unmountedRef.current = false;
