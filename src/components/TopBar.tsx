@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useGame } from "../context/GameContext";
 import { ZONES, ZONE_META } from "../config/zonesConfig";
-import DownloadButton from "./DownloadButton";
 import ThemeToggle from "./ThemeToggle";
-import { RESUME_FILE, PORTFOLIO_FILE } from "../utils/fileDownload";
+import DocsModal from "./DocsModal";
 
 const TOP_BAR_LABELS: Record<string, string> = {
   about: "About",
@@ -22,14 +21,21 @@ export interface TopBarProps {
 }
 
 /**
- * 화면 상단 고정 내비게이션 바. 데스크톱에서는 가로 메뉴 + 다운로드 버튼을, 768px 이하
- * 모바일에서는 햄버거 메뉴로 전환해 보여준다. `useGame()`의 `hintZone`/`activeZone`을
+ * 화면 상단 고정 내비게이션 바. 데스크톱에서는 가로 메뉴(zone 버튼 + Docs)를, 768px 이하
+ * 모바일에서는 햄버거 메뉴로 전환해 보여준다. Resume/Portfolio/Career 등 문서 다운로드는
+ * Docs 버튼으로 열리는 DocsModal 안에서 관리한다. `useGame()`의 `hintZone`/`activeZone`을
  * 구독해 현재 가까이 있거나 들어가 있는 zone의 메뉴 항목을 강조(active)한다.
  */
 export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
-  const { hintZone, activeZone } = useGame();
+  const {
+    hintZone,
+    activeZone,
+    mobileMenuOpen: menuOpen,
+    setMobileMenuOpen: setMenuOpen,
+    docsModalOpen: docsOpen,
+    setDocsModalOpen: setDocsOpen,
+  } = useGame();
   const highlighted = activeZone || hintZone;
-  const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef<HTMLHeadElement>(null);
 
   // 실제 렌더링된 TopBar 높이를 CSS 변수로 노출해 Online Visitors Badge 등
@@ -74,6 +80,11 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
     setMenuOpen(false);
   };
 
+  const handleDocsClick = () => {
+    setDocsOpen(true);
+    setMenuOpen(false);
+  };
+
   const renderZoneButtons = (extraClassName = "") =>
     ZONES.map((zoneKey) => (
       <button
@@ -88,92 +99,76 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
     ));
 
   return (
-    <header className="top-bar" ref={headerRef}>
-      <span
-        className="top-bar-name"
-        onClick={handleHomeClick}
-        onKeyDown={handleHomeKeyDown}
-        role="button"
-        tabIndex={0}
-        aria-label="홈으로 이동"
-        title="홈으로 이동"
-      >
-        HOME
-      </span>
-
-      {/* PC: 가로 메뉴. 768px 이하에서는 CSS로 숨기고 햄버거 메뉴를 대신 보여준다 */}
-      <nav className="top-bar-nav top-bar-nav-desktop" aria-label="주요 메뉴">
-        {renderZoneButtons()}
-      </nav>
-      <div
-        className="top-bar-downloads top-bar-downloads-desktop"
-        role="group"
-        aria-label="주요 링크"
-      >
-        <DownloadButton
-          file={RESUME_FILE}
-          icon="📄"
-          label="Resume PDF"
-          ariaLabel="이력서 PDF 다운로드 또는 새 탭에서 열기"
-        />
-        <DownloadButton
-          file={PORTFOLIO_FILE}
-          icon="📁"
-          label="Portfolio PDF"
-          ariaLabel="포트폴리오 PDF 다운로드 또는 새 탭에서 열기"
-        />
-      </div>
-
-      {/* 데스크탑/모바일 모두 항상 노출 — 햄버거 메뉴 안에 숨기지 않는다 */}
-      <ThemeToggle />
-
-      {/* 모바일(768px 이하): 햄버거 버튼. CSS로 PC에서는 숨긴다 */}
-      <button
-        type="button"
-        className="hamburger-btn"
-        aria-expanded={menuOpen}
-        aria-controls="mobile-menu-panel"
-        aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
-        onClick={() => setMenuOpen((open) => !open)}
-      >
-        <span className="hamburger-icon" aria-hidden="true">
-          {menuOpen ? "✕" : "☰"}
+    <>
+      <header className="top-bar" ref={headerRef}>
+        <span
+          className="top-bar-name"
+          onClick={handleHomeClick}
+          onKeyDown={handleHomeKeyDown}
+          role="button"
+          tabIndex={0}
+          aria-label="홈으로 이동"
+          title="홈으로 이동"
+        >
+          HOME
         </span>
-      </button>
 
-      {menuOpen && (
-        <>
+        {/* PC: 가로 메뉴. 768px 이하에서는 CSS로 숨기고 햄버거 메뉴를 대신 보여준다 */}
+        <nav className="top-bar-nav top-bar-nav-desktop" aria-label="주요 메뉴">
+          {renderZoneButtons()}
           <button
             type="button"
-            className="mobile-menu-backdrop"
-            aria-label="메뉴 닫기"
-            onClick={() => setMenuOpen(false)}
-          />
-          <div id="mobile-menu-panel" className="mobile-menu-panel" role="menu">
-            <nav className="mobile-menu-nav" aria-label="주요 메뉴">
-              {renderZoneButtons("mobile-menu-link")}
-            </nav>
-            <div className="mobile-menu-downloads" role="group" aria-label="문서 다운로드">
-              <DownloadButton
-                file={RESUME_FILE}
-                icon="📄"
-                label="Resume PDF"
-                ariaLabel="이력서 PDF 다운로드 또는 새 탭에서 열기"
-                className="download-btn-large"
-                onAfterClick={() => setMenuOpen(false)}
-              />
-              <DownloadButton
-                file={PORTFOLIO_FILE}
-                icon="📁"
-                label="Portfolio PDF"
-                ariaLabel="포트폴리오 PDF 다운로드 또는 새 탭에서 열기"
-                className="download-btn-large"
-                onAfterClick={() => setMenuOpen(false)}
-              />
+            className={`top-bar-link${docsOpen ? " active" : ""}`}
+            onClick={handleDocsClick}
+          >
+            <span className="top-bar-link-icon">📄</span>
+            Docs
+          </button>
+        </nav>
+
+        {/* 데스크탑/모바일 모두 항상 노출 — 햄버거 메뉴 안에 숨기지 않는다 */}
+        <ThemeToggle />
+
+        {/* 모바일(768px 이하): 햄버거 버튼. CSS로 PC에서는 숨긴다 */}
+        <button
+          type="button"
+          className="hamburger-btn"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu-panel"
+          aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span className="hamburger-icon" aria-hidden="true">
+            {menuOpen ? "✕" : "☰"}
+          </span>
+        </button>
+
+        {menuOpen && (
+          <>
+            <button
+              type="button"
+              className="mobile-menu-backdrop"
+              aria-label="메뉴 닫기"
+              onClick={() => setMenuOpen(false)}
+            />
+            <div id="mobile-menu-panel" className="mobile-menu-panel" role="menu">
+              <nav className="mobile-menu-nav" aria-label="주요 메뉴">
+                {renderZoneButtons("mobile-menu-link")}
+                <button
+                  type="button"
+                  className="top-bar-link mobile-menu-link"
+                  onClick={handleDocsClick}
+                >
+                  <span className="top-bar-link-icon">📄</span>
+                  Docs
+                </button>
+              </nav>
             </div>
-          </div>
-        </>
-      )}
-    </header>
+          </>
+        )}
+      </header>
+
+      {docsOpen && <DocsModal onClose={() => setDocsOpen(false)} />}
+    </>
   );
 }

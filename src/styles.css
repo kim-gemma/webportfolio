@@ -711,23 +711,6 @@ a:hover {
   justify-content: flex-start;
 }
 
-.mobile-menu-downloads {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 10px;
-  border-top: 1px dashed var(--color-border);
-}
-
-/* ------------------------------------------------------------
-   상단 메뉴: 이력서 / 포트폴리오 다운로드
-   ------------------------------------------------------------ */
-.top-bar-downloads {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
 .download-btn {
   display: flex;
   align-items: center;
@@ -770,18 +753,49 @@ a:hover {
   font-size: 18px;
 }
 
-@media (max-width: 480px) {
-  .top-bar-downloads-desktop .download-btn {
-    padding: 6px 8px;
-    font-size: 0;
-    gap: 0;
+/* ------------------------------------------------------------
+   Docs 모달: Resume / Portfolio / Career Description 등 문서 카드
+   ------------------------------------------------------------ */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .docs-grid {
+    grid-template-columns: 1fr;
   }
-  .top-bar-downloads-desktop .download-btn-icon {
-    font-size: 16px;
-  }
-  .top-bar-downloads-desktop .download-btn-pdf {
-    display: none;
-  }
+}
+
+.docs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--color-panel-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.docs-card-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.docs-card-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.docs-card-desc {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text-dim);
+  margin: 0 0 4px;
+  flex: 1;
 }
 
 .game-stage {
@@ -1454,8 +1468,7 @@ a:hover {
    뒤에 위치시켜 동일 우선순위에서도 항상 이 규칙이 이기게 한다.
    ------------------------------------------------------------ */
 @media (max-width: 768px) {
-  .top-bar-nav-desktop,
-  .top-bar-downloads-desktop {
+  .top-bar-nav-desktop {
     display: none;
   }
   .hamburger-btn {

@@ -12,6 +12,11 @@ export const PORTFOLIO_FILE = {
   label: "포트폴리오",
 };
 
+export const CAREER_FILE = {
+  path: "/files/career.pdf",
+  label: "경력기술서",
+};
+
 // 새 탭에서 PDF를 열어, 브라우저 자체 뷰어의 다운로드 버튼으로도 저장할 수 있게 한다
 export function openDownloadFile(path) {
   const link = document.createElement("a");
