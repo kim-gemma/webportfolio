@@ -35,37 +35,51 @@ export async function generateNpcReply(history: GeminiChatTurn[]): Promise<strin
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${env.geminiModel}:generateContent?key=${env.geminiApiKey}`;
   console.log(`[geminiService] using model: ${env.geminiModel}`);
 
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: NPC_SYSTEM_PROMPT }] },
-        contents: history.map((turn) => ({
-          role: turn.role,
-          parts: [{ text: turn.text }],
-        })),
-        generationConfig: {
-          maxOutputTokens: 768,
-          temperature: 0.65,
-        },
-      }),
-    });
-  } catch (err) {
-    // 네트워크 단절 등 fetch 자체가 실패한 경우 (Gemini가 응답조차 못한 상태)
-    throw new GeminiApiError(0, `Failed to reach Gemini API: ${(err as Error).message}`);
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: NPC_SYSTEM_PROMPT }] },
+    contents: history.map((turn) => ({
+      role: turn.role,
+      parts: [{ text: turn.text }],
+    })),
+    generationConfig: {
+      maxOutputTokens: 768,
+      temperature: 0.65,
+    },
+  });
+
+  // Gemini가 일시적으로 과부하(503)일 때 바로 실패시키지 않고 짧게 재시도한다.
+  const maxAttempts = 3;
+  const retryDelaysMs = [500, 1000];
+  let response: Response | undefined;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+      });
+    } catch (err) {
+      // 네트워크 단절 등 fetch 자체가 실패한 경우 (Gemini가 응답조차 못한 상태)
+      throw new GeminiApiError(0, `Failed to reach Gemini API: ${(err as Error).message}`);
+    }
+
+    if (response.status !== 503 || attempt === maxAttempts - 1) {
+      break;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
   }
 
-  if (!response.ok) {
-    const errorBody = await response.text().catch(() => "");
+  if (!response!.ok) {
+    const errorBody = await response!.text().catch(() => "");
     throw new GeminiApiError(
-      response.status,
-      `Gemini API responded with status ${response.status}: ${errorBody}`
+      response!.status,
+      `Gemini API responded with status ${response!.status}: ${errorBody}`
     );
   }
 
-  const data = (await response.json()) as GeminiGenerateContentResponse;
+  const data = (await response!.json()) as GeminiGenerateContentResponse;
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!text) {
