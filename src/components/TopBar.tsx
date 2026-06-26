@@ -30,6 +30,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
   const {
     hintZone,
     activeZone,
+    closeZone,
     mobileMenuOpen: menuOpen,
     setMobileMenuOpen: setMenuOpen,
     docsModalOpen: docsOpen,
@@ -65,6 +66,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
 
   const handleHomeClick = () => {
     setMenuOpen(false);
+    setDocsOpen(false);
     onHomeSelect();
   };
 
@@ -76,11 +78,13 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
   };
 
   const handleZoneClick = (zoneKey: string) => {
+    setDocsOpen(false);
     onZoneSelect(zoneKey);
     setMenuOpen(false);
   };
 
   const handleDocsClick = () => {
+    closeZone();
     setDocsOpen(true);
     setMenuOpen(false);
   };

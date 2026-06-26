@@ -1237,29 +1237,11 @@ a:hover {
   color: var(--color-accent);
 }
 
-.projects-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.project-card {
-  background: var(--color-panel-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 18px;
-}
-
-.project-name {
-  font-size: 15px;
-  margin: 0 0 8px;
-}
-
-.project-desc {
+.project-section-title {
+  font-family: var(--font-display);
   font-size: 13px;
-  line-height: 1.7;
-  color: var(--color-text-dim);
-  margin: 0 0 12px;
+  color: var(--color-text);
+  margin: 28px 0 12px;
 }
 
 .project-tags {
@@ -1280,14 +1262,6 @@ a:hover {
 .project-link {
   font-size: 12px;
   font-weight: 600;
-}
-
-.project-detail-grid {
-  gap: 18px;
-}
-
-.project-detail-card {
-  padding: 22px;
 }
 
 .project-detail-sections {
@@ -1317,10 +1291,6 @@ a:hover {
   line-height: 1.7;
 }
 
-.project-tags-compact {
-  margin-bottom: 0;
-}
-
 .project-detail-list,
 .interview-list {
   margin: 0;
@@ -1330,24 +1300,49 @@ a:hover {
   line-height: 1.8;
 }
 
-.architecture-inline {
+.before-after-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 4px 0 20px;
+}
+
+.before-after-pair {
   display: grid;
-  gap: 4px;
-  margin: 14px 0;
-  padding: 12px;
-  border-left: 4px solid var(--zone-color, var(--color-accent));
-  background: var(--color-panel);
-  border-radius: 6px;
-  font-size: 12px;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
 }
 
-.architecture-inline strong {
-  color: var(--color-teal);
-}
-
-.architecture-inline span {
+.before-after-card {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-panel-raised);
+  padding: 12px 14px;
+  font-size: 13px;
   color: var(--color-text-dim);
-  line-height: 1.6;
+}
+
+.before-after-card.after {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-panel-raised));
+}
+
+.before-after-arrow {
+  color: var(--color-teal);
+  font-family: var(--font-display);
+  font-size: 14px;
+}
+
+@media (max-width: 560px) {
+  .before-after-pair {
+    grid-template-columns: 1fr;
+  }
+  .before-after-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
 }
 
 .interview-section {

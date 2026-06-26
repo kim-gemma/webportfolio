@@ -213,214 +213,124 @@ export const PORTFOLIO_DATA = {
     },
   ],
 
-  projects: [
-    {
-      id: "proj-one-ai-mobile",
-      name: "ONE AI Mobile — AI 업무 생산성 서비스",
-      description:
-        "기업 사용자가 문서 분석, 음성 입력, AI 응답을 모바일에서 빠르게 활용할 수 있도록 만든 AI 생산성 서비스입니다. 실시간 AI 응답 환경과 안정적인 STT 상태 관리를 통해 회의·문서 업무 중 발생하는 대기 시간과 입력 불편을 줄였습니다.",
-      tags: ["AI Productivity", "React Native", "STT", "Real-time AI"],
-      link: null,
-      featured: true,
-      overview:
-        "기업 사용자가 모바일에서 AI 문서 분석, 음성 입력, AI 응답을 업무 흐름 안에서 바로 사용할 수 있도록 만든 생산성 기능입니다.",
-      problem:
-        "AI 응답은 지연 시간이 길고 STT/OCR은 플랫폼 권한과 네트워크 상태에 따라 실패 가능성이 높아, 모바일 업무 화면에서 사용자가 상태를 이해하기 어려웠습니다.",
-      solution:
-        "AI 요청 상태를 명확히 분리하고, 응답 생성 중 UI와 실패/재시도 흐름을 설계했습니다. STT 권한, 입력 상태, 결과 반영 흐름을 화면 상태와 분리해 안정적으로 제어했습니다.",
-      outcome:
-        "회의 정리, 문서 탐색, 음성 입력처럼 반복되는 업무를 모바일에서 이어갈 수 있게 하며 AI 기능을 독립 데모가 아닌 실제 업무 서비스 경험으로 연결했습니다.",
-      techStack: ["React Native", "TypeScript", "OpenAI", "STT", "OCR", "Streaming UI"],
-      ownership: [
-        "AI Chat 및 응답 상태 UI 구현",
-        "STT 권한/녹음/결과 반영 흐름 개발",
-        "AI 회의록·OCR 기능의 모바일 사용성 개선",
-        "로딩, 실패, 재시도 상태를 포함한 사용자 피드백 설계",
-      ],
-      architectureNote:
-        "Architecture Zone에서 Frontend → Backend → AI 응답 흐름과 실시간 UI 연결 구조를 확인할 수 있습니다.",
-      interviewQuestions: [
-        "Q. AI Streaming UI는 어떻게 구현했나요?",
-        "Q. STT 권한과 녹음 상태는 어떤 기준으로 분리했나요?",
-        "Q. AI 응답 실패 시 사용자 경험은 어떻게 설계했나요?",
-      ],
-    },
-    {
-      id: "proj-onechamber",
-      name: "Mobile OneChamber — 기업 문서관리 모바일 서비스",
-      description:
-        "기업 사용자가 대용량 문서를 모바일에서도 안정적으로 등록·관리할 수 있도록 지원한 문서관리 서비스입니다. 100MB 이상 파일 업로드 과정의 실패 가능성을 줄이고, 문서 처리 상태를 명확히 분리해 업무 중단 없이 문서 업무를 이어갈 수 있게 했습니다.",
-      tags: ["Document Management", "Enterprise SaaS", "React Native", "REST API"],
-      link: null,
-      featured: true,
-      overview:
-        "기업 문서를 모바일에서 등록, 업로드, 조회할 수 있게 만든 문서관리 서비스입니다.",
-      problem:
-        "모바일 환경에서는 대용량 파일 업로드 실패, Android/iOS 파일 경로 차이, 권한 기반 문서 접근 같은 제약이 동시에 발생했습니다.",
-      solution:
-        "파일 선택, 업로드 상태, 서버 응답 처리, 실패 피드백을 단계별로 분리했습니다. 플랫폼별 파일 저장/접근 차이를 고려해 네이티브 연동 흐름을 안정화했습니다.",
-      outcome:
-        "100MB 이상 파일 업로드와 문서 처리 상태를 사용자가 이해할 수 있게 만들고, PC 중심 문서 업무를 모바일에서도 끊기지 않게 확장했습니다.",
-      techStack: ["React Native", "REST API", "WebView-Native Bridge", "Android/iOS File System", "Enterprise SaaS"],
-      ownership: [
-        "대용량 문서 업로드 UI 및 상태 처리",
-        "Android/iOS 파일 저장·접근 차이 대응",
-        "권한 기반 문서 조회 흐름 구현",
-        "문서 처리 상태와 오류 피드백 개선",
-      ],
-      architectureNote:
-        "Architecture Zone에서 모바일 프론트엔드와 백엔드/데이터베이스로 이어지는 문서 데이터 흐름을 확인할 수 있습니다.",
-      interviewQuestions: [
-        "Q. Android와 iOS 파일 저장 차이를 어떻게 해결했나요?",
-        "Q. 대용량 업로드 실패 가능성은 어떻게 줄였나요?",
-        "Q. 기업 문서 권한 처리는 프론트엔드에서 어떻게 표현했나요?",
-      ],
-    },
-    {
-      id: "proj-oneffice",
-      name: "ONEFFICE Mobile — 모바일 업무 환경 확장",
-      description:
-        "기업 사용자가 모바일 환경에서도 PC와 동일한 문서·협업 업무를 수행할 수 있도록 지원한 모바일 서비스입니다. WebView-Native Bridge, 인증, 권한 제어를 통해 기존 업무 시스템을 모바일로 확장하면서 기업 보안 요구사항에 대응했습니다.",
-      tags: ["Mobile Enterprise Platform", "WebView", "RBAC", "Enterprise Security"],
-      link: null,
-      featured: true,
-      overview:
-        "기존 PC 기반 문서·협업 업무를 모바일에서도 사용할 수 있도록 확장한 기업용 모바일 플랫폼 경험입니다.",
-      problem:
-        "PC 업무 기능을 모바일로 옮길 때 인증, 권한, WebView와 Native 간 데이터 전달, 플랫폼별 보안 정책이 복잡하게 얽혔습니다.",
-      solution:
-        "WebView-Native Bridge로 양방향 통신을 구성하고, 인증/권한 상태를 화면 진입과 기능 실행 조건에 맞춰 제어했습니다.",
-      outcome:
-        "기업 사용자가 모바일에서도 문서 작성, 조회, 협업 업무를 이어갈 수 있게 했고, 기존 시스템과 모바일 앱 사이의 경험 차이를 줄였습니다.",
-      techStack: ["React Native", "WebView", "Native Bridge", "RBAC", "Enterprise Security"],
-      ownership: [
-        "WebView-Native Bridge 기반 기능 연동",
-        "인증 및 권한 상태에 따른 화면/기능 제어",
-        "모바일 플랫폼별 예외 케이스 대응",
-        "기존 PC 업무 플로우의 모바일 UX 변환",
-      ],
-      architectureNote:
-        "Architecture Zone에서 Frontend 레이어의 React Native/WebView Bridge 역할을 따로 정리했습니다.",
-      interviewQuestions: [
-        "Q. WebView-Native Bridge는 어떤 방식으로 설계했나요?",
-        "Q. 기업 보안 요구사항은 모바일 화면에서 어떻게 반영했나요?",
-        "Q. 권한 상태와 화면 상태는 어떻게 분리했나요?",
-      ],
-    },
-    {
-      id: "proj-amaranth-chat",
-      name: "Amaranth10 Messenger & Video Conference",
-      description:
-        "조직도 기반 협업이 필요한 기업 사용자를 위해 메신저와 화상회의 모바일 경험을 개발했습니다. 조직도 기반 참여자 초대, 채팅방 관리, 회의 입장 흐름, AI 회의록 연동을 통해 커뮤니케이션과 회의 기록이 하나의 업무 흐름 안에서 이어지도록 구성했습니다.",
-      tags: [
-        "Enterprise Collaboration",
-        "Business Productivity",
-        "Video Conference",
-        "AI Meeting Notes",
-        "React Native",
-      ],
-      link: null,
-      featured: true,
-      overview:
-        "기업 조직도 기반 메신저와 화상회의 흐름을 모바일에서 사용할 수 있게 만든 실시간 협업 경험입니다.",
-      problem:
-        "메신저, 조직도, 참여자 초대, 회의 입장, AI 회의록은 각각 다른 기능처럼 보이지만 실제 업무에서는 하나의 커뮤니케이션 흐름으로 이어져야 했습니다.",
-      solution:
-        "조직도 기반 사용자 선택, 채팅방 관리, 회의 입장 상태, 회의록 연결 흐름을 모바일 화면에 맞춰 정리하고 실시간 상태 변화를 빠르게 반영했습니다.",
-      outcome:
-        "커뮤니케이션, 회의, 기록이 분리되지 않고 하나의 업무 흐름으로 이어지도록 구성해 기업 협업 서비스의 모바일 사용성을 높였습니다.",
-      techStack: ["React Native", "WebSocket", "Real-time Communication", "Video Conference", "AI Meeting Notes"],
-      ownership: [
-        "조직도 기반 사용자 탐색 및 참여자 초대 흐름 구현",
-        "메신저/채팅방 관리 UI 개발",
-        "화상회의 입장 및 회의 상태 화면 구현",
-        "AI 회의록과 커뮤니케이션 흐름 연결",
-      ],
-      architectureNote:
-        "Architecture Zone에서 WebSocket 기반 실시간 통신이 UI 상태와 어떻게 연결되는지 확인할 수 있습니다.",
-      interviewQuestions: [
-        "Q. WebSocket을 사용한 이유는?",
-        "Q. 실시간 상태와 화면 상태는 어떻게 동기화했나요?",
-        "Q. 메신저와 화상회의 UX를 모바일에서 어떻게 단순화했나요?",
-      ],
-    },
-    {
-      id: "proj-whatflix",
-      name: "WhatFlix",
-      description:
-        "사용자가 콘텐츠를 더 쉽게 탐색하고 개인화된 추천 흐름을 경험할 수 있도록 만든 React + Spring Boot 풀스택 프로젝트입니다. 외부 API 연동, 무한 스크롤, Kakao OAuth 인증을 통해 실제 서비스형 탐색 경험을 구성했습니다.",
-      tags: ["React", "Context API", "Spring Boot", "Kakao OAuth"],
-      link: null,
-    },
-    {
-      id: "proj-web-builder",
-      name: "Web Builder Template Frontend",
-      description:
-        "템플릿 제작자가 반복 UI를 더 빠르게 구성할 수 있도록 공통 컴포넌트와 반응형 레이아웃을 정리한 프로젝트입니다. 모듈화된 컴포넌트 구조로 신규 템플릿 제작 시간을 줄이고 유지보수성을 높였습니다.",
-      tags: ["React", "TypeScript", "HTML/CSS"],
-      link: null,
-    },
-    {
-      id: "proj-doggyforest",
-      name: "강아지숲 반응형 웹 전환",
-      description:
-        "PC 중심으로 제공되던 웹 경험을 모바일 사용자도 자연스럽게 이용할 수 있도록 Mobile-first 구조로 전환했습니다. 재사용 가능한 컴포넌트와 시맨틱 마크업·ARIA 적용으로 사용성과 접근성을 함께 개선했습니다.",
-      tags: ["React", "TypeScript", "Responsive Web"],
-      link: null,
-    },
-    {
-      id: "proj-design-system",
-      name: "Design System & Storybook",
-      description:
-        "화면이 늘어날수록 UI 품질이 흔들리지 않도록 공통 컴포넌트와 Design Token을 정리한 프로젝트입니다. Storybook으로 상태별 UI를 문서화해 반복 개발 과정에서도 일관된 사용자 경험을 유지할 수 있게 했습니다.",
-      tags: ["React", "TypeScript", "Storybook", "Design System"],
-      link: null,
-    },
-    {
-      id: "proj-garden-portfolio",
-      name: "코드 정원 포트폴리오",
-      description:
-        "면접관이 이력서를 순서대로 읽는 대신 직접 탐색하며 경험을 확인할 수 있도록 만든 인터랙티브 포트폴리오입니다. AI Portfolio Assistant, 실시간 방문자 표시, 문의 알림, 디자인 시스템을 연결해 단순 소개 페이지가 아니라 운영 가능한 작은 서비스처럼 구성했습니다.",
-      tags: ["React", "TypeScript", "Phaser.js", "AI Productivity", "WebSocket" ,],
-      featured: true,
-      overview:
-        "경력 정보를 게임형 인터페이스로 탐색하되, 실제 운영 가능한 작은 서비스처럼 AI, 실시간 접속자, 문의 알림, 데이터 저장을 연결한 포트폴리오입니다.",
-      problem:
-        "일반 포트폴리오는 기억에 남기 어렵고, 단순 프론트엔드 화면만으로는 백엔드/실시간/AI 연결 경험을 보여주기 어렵습니다.",
-      solution:
-        "React와 Phaser로 탐색 경험을 만들고, Node.js 서버, MySQL, WebSocket, AI API, Discord 알림, AWS 배포를 연결해 서비스 흐름 전체를 구성했습니다.",
-      outcome:
-        "프론트엔드 중심 역량을 유지하면서도 실시간 통신, AI 연동, 데이터 저장, 배포 운영 이해를 함께 보여주는 경력 전시관으로 확장했습니다.",
-      techStack: ["React", "TypeScript", "Phaser.js", "Node.js", "MySQL", "WebSocket", "OpenAI", "AWS"],
-      ownership: [
-        "게임형 인터랙션과 포트폴리오 정보 구조 설계",
-        "AI Portfolio Assistant UI 및 API 연동",
-        "WebSocket 기반 실시간 방문자 표시 구현",
-        "문의 저장, Discord 알림, AWS 배포 흐름 구성",
-      ],
-      architectureNote:
-        "Architecture Zone에서 Frontend → Backend → Database → Infra → AI 전체 연결을 시각화했습니다.",
-      achievements: [
-        "Storybook 기반 UI 컴포넌트 문서화",
-        "AWS S3 + CloudFront 기반 프론트엔드 배포",
-        "AWS EC2 + Nginx + PM2 기반 서버 운영",
-        "AWS RDS 기반 문의 및 방문자 데이터 저장",
-        "AWS CloudWatch 기반 로그 모니터링 환경 구축",
-        "Design Token 기반 디자인 시스템 구축",
-        "OpenAI·Gemini 기반 AI Portfolio Assistant 구현",
-        "WebSocket 실시간 방문자 기능 구현",
-        "Discord Webhook 실시간 알림 연동",
-        "다크 모드 및 반응형 UI 지원",
-        "Lighthouse·React DevTools Profiler·rollup-plugin-visualizer 기반 성능 분석 및 코드 스플리팅 적용",
-      ],
-      link: null,
-      interviewQuestions: [
-        "Q. Zustand를 선택한 이유는?",
-        "Q. WebSocket 실시간 방문자 기능은 어떻게 구현했나요?",
-        "Q. 프론트엔드 포트폴리오에 Node.js와 MySQL을 연결한 이유는?",
-      ],
-    },
-  ],
+  flagshipProject: {
+    id: "proj-garden-portfolio",
+    name: "Pixel Garden — 코드 정원 포트폴리오",
+    tagline:
+      "면접관이 이력서를 순서대로 읽는 대신, 직접 탐험하며 경험을 확인할 수 있도록 만든 인터랙티브 포트폴리오입니다.",
+    tags: ["React", "TypeScript", "Phaser.js", "Node.js", "WebSocket", "AWS"],
+    link: null,
+    why: [
+      {
+        title: "왜 게임형 포트폴리오인가",
+        description:
+          "텍스트 위주 포트폴리오는 스크롤 몇 번이면 끝나서 기억에 남기 어렵다고 판단했습니다. 방문자가 직접 캐릭터를 움직여 About/Skills/CV/Projects 같은 구역을 찾아가게 만들면, 같은 정보라도 둘러보는 경험 자체가 차별점이 됩니다.",
+      },
+      {
+        title: "왜 Phaser인가",
+        description:
+          "React만으로 캐릭터 이동, 충돌 판정, 카메라 트윈 같은 게임 루프를 다루면 코드가 금방 복잡해집니다. 캔버스 렌더링과 씬 관리를 전담하는 Phaser를 게임 레이어로 분리하고, React는 모달·HUD 같은 DOM UI에 집중하도록 역할을 나눴습니다.",
+      },
+      {
+        title: "왜 스크롤 대신 인터랙션인가",
+        description:
+          "세로 스크롤 포트폴리오는 정보 구조가 고정돼 있어 방문자가 순서대로만 읽게 됩니다. 맵 위에서 원하는 zone으로 먼저 이동할 수 있는 자유를 주고 싶어서 클릭/이동 기반 인터랙션을 선택했습니다.",
+      },
+    ],
+    coreFeatures: [
+      { icon: "🎮", title: "Pixel World" },
+      { icon: "🤖", title: "AI Portfolio Assistant" },
+      { icon: "📧", title: "Contact System" },
+      { icon: "🌙", title: "Dark Mode" },
+      { icon: "📱", title: "Mobile Joystick" },
+      { icon: "👥", title: "Online Visitors" },
+      { icon: "💬", title: "NPC Conversation" },
+      { icon: "🛰", title: "WebSocket" },
+      { icon: "☁", title: "AWS Deploy" },
+    ],
+    implementation: [
+      "Phaser 게임 엔진으로 Intro/Loading/Garden Scene 구성",
+      "GameContext로 Phaser 인스턴스와 React 상태(활성 zone, 모바일 메뉴, 모달 열림 여부) 연결",
+      "Zone 진입에 따라 ZoneModal에서 About/Skills/CV/Projects/Architecture/Contact 콘텐츠 전환",
+      "NPC 대화 시스템과 AI Portfolio Assistant 채팅 UI 구현",
+      "Mailbox 오브젝트 기반 Contact 시스템 + Discord Webhook 실시간 알림 연동",
+      "WebSocket으로 실시간 접속자 수 표시, 연결 상태(연결 중/Online/재연결 중) 처리",
+      "localStorage와 OS 다크모드 설정을 함께 보는 테마 토글 구현",
+      "VirtualJoystick으로 모바일 캐릭터 이동 처리",
+      "768px 기준 데스크톱 가로 메뉴 ↔ 모바일 햄버거 메뉴 반응형 레이아웃",
+      "AWS S3+CloudFront(프론트엔드), EC2+Nginx+PM2(서버), RDS(MySQL) 배포 구성",
+      "Scene 단위 코드 스플리팅, React.memo·useMemo로 불필요한 리렌더 축소",
+    ],
+    architecture: [
+      { label: "React", role: "UI 셸", description: "TopBar, ZoneModal, Docs/Contact 같은 모달과 전역 레이아웃을 담당합니다." },
+      { label: "Game Provider", role: "GameContext", description: "Phaser 인스턴스와 React 상태(활성 zone, 모달 열림 여부)를 양방향으로 연결합니다." },
+      { label: "Phaser", role: "게임 엔진", description: "캔버스 렌더링, 캐릭터 이동, 충돌 판정을 전담합니다." },
+      { label: "Scene", role: "Intro / Garden", description: "오프닝 시퀀스에서 게임 화면으로 전환되는 씬 단위 구조입니다." },
+      { label: "NPC", role: "캐릭터 인터랙션", description: "맵 위 캐릭터에게 다가가면 대화가 시작되는 인터랙션을 처리합니다." },
+      { label: "Chat", role: "AI Portfolio Assistant", description: "NPC 대화와 챗 위젯에서 입력한 질문을 AI 응답으로 연결합니다." },
+      { label: "API", role: "REST / WebSocket", description: "Contact 제출, AI 응답 요청, 실시간 방문자 수 통신을 처리합니다." },
+      { label: "Server", role: "Node.js / Express", description: "AWS EC2 위에서 Nginx·PM2로 운영되는 백엔드입니다." },
+      { label: "MySQL", role: "AWS RDS", description: "문의 내역과 방문자 이벤트를 저장합니다." },
+    ],
+    challenges: [
+      {
+        title: "React ↔ Phaser 상태 동기화",
+        description:
+          "Phaser는 자체 게임 루프로 캐릭터/씬을 관리하고 React는 모달과 UI를 선언적으로 관리해서 두 상태가 어긋나기 쉬웠습니다. GameContext에서 Phaser 인스턴스의 메서드(zone 이동, 조이스틱 입력)를 React 콜백으로 감싸 한 방향으로만 상태가 흐르게 정리했습니다.",
+      },
+      {
+        title: "Intro → Garden Scene 전환",
+        description:
+          "오프닝에서 캐릭터가 몇 걸음 걷고 카메라가 줌인된 뒤 다음 씬으로 넘어가는 연출은 타이밍이 어긋나면 어색해 보여서, 트윈 완료 콜백 기준으로 씬 전환 시점을 맞췄습니다.",
+      },
+      {
+        title: "모바일 가상 조이스틱 UX",
+        description:
+          "터치 입력은 마우스/키보드와 달리 입력 벡터가 끊기거나 튀는 문제가 있어서, 조이스틱 좌표를 정규화해 Phaser의 캐릭터 이동 벡터로 그대로 전달하는 방식으로 단순화했습니다.",
+      },
+      {
+        title: "WebSocket 재연결 처리",
+        description:
+          "방문자 수 WebSocket이 끊기면 화면이 멈춘 것처럼 보여서, connecting/connected/disconnected 상태를 따로 두고 재연결 중에는 \"재연결 중...\"이라고 명확히 표시했습니다.",
+      },
+      {
+        title: "다크모드 토글의 포커스 버그",
+        description:
+          "마우스로 다크모드 버튼을 클릭한 뒤 포커스가 버튼에 남아있으면, 게임 화면에서 Enter를 눌러 다음 동작을 할 때 그 Enter가 버튼 클릭으로도 합성되어 테마가 다시 바뀌는 버그가 있었습니다. 클릭 직후 버튼 포커스를 강제로 비워서 해결했습니다.",
+      },
+      {
+        title: "Discord Webhook 알림 연동",
+        description:
+          "Contact 폼 제출을 실시간으로 알아야 해서, 서버에서 문의를 저장한 뒤 Discord Webhook으로 바로 알림을 보내도록 연결했습니다.",
+      },
+      {
+        title: "AWS 배포 구성",
+        description:
+          "프론트엔드(S3+CloudFront), 서버(EC2+Nginx+PM2), 데이터베이스(RDS)를 분리해서 배포하면서, 정적 자산과 API/WebSocket 요청이 서로 다른 도메인·경로로 흩어지는 구성을 정리했습니다.",
+      },
+    ],
+    beforeAfter: [
+      { before: "정적인 텍스트 포트폴리오", after: "캐릭터로 맵을 탐험하는 포트폴리오" },
+      { before: "단순 Contact Form", after: "제출 즉시 Discord로 알림이 오는 Contact System" },
+      { before: "텍스트로 나열한 소개", after: "NPC·AI Portfolio Assistant와의 대화" },
+    ],
+    buildStory: [
+      "Idea",
+      "Prototype",
+      "Game Engine",
+      "NPC",
+      "AI Assistant",
+      "Contact",
+      "Deploy",
+      "Mobile Optimization",
+      "Release",
+    ],
+    interviewQuestions: [
+      "Q. React와 Phaser 사이의 상태는 어떻게 동기화했나요?",
+      "Q. WebSocket 연결이 끊겼을 때 사용자에게는 어떻게 보여주나요?",
+      "Q. NPC 대화와 AI Portfolio Assistant는 같은 API를 쓰나요?",
+    ],
+  },
 
   architecture: {
     layers: [

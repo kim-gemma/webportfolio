@@ -1,10 +1,8 @@
 import { ZONE_META } from "../config/zonesConfig";
 
 const QUICK_ITEMS = [
-  { label: "ONE AI", zoneKey: "projects" },
-  { label: "Enterprise Collaboration", zoneKey: "projects" },
-  { label: "Messenger & Video Conference", zoneKey: "projects" },
-  { label: "Pixel Garden Architecture", zoneKey: "architecture" },
+  { label: "Pixel Garden 소개", zoneKey: "projects" },
+  { label: "Architecture", zoneKey: "architecture" },
 ];
 
 export default function QuickNavigation({ onSelect }) {
