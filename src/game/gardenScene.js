@@ -158,6 +158,25 @@ export function createGardenScene({
         Phaser.Input.Keyboard.KeyCodes.E
       );
 
+      // WASD/화살표 키는 Phaser가 전역(window)에서 캡처해 preventDefault를 호출하기 때문에,
+      // Contact 폼처럼 모달 위에 떠 있는 input/textarea에 포커스가 있어도 "w","a","s","d"
+      // 같은 글자가 입력되지 않고 캐릭터만 움직이는 문제가 있었다. 텍스트 입력 요소에
+      // 포커스가 있는 동안만 전역 캡처를 잠깐 풀어서 타이핑이 정상 동작하게 한다.
+      const isTypingTarget = (el) =>
+        !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+      this.handleFocusIn = (e) => {
+        if (isTypingTarget(e.target)) this.input.keyboard.disableGlobalCapture();
+      };
+      this.handleFocusOut = (e) => {
+        if (isTypingTarget(e.target)) this.input.keyboard.enableGlobalCapture();
+      };
+      window.addEventListener("focusin", this.handleFocusIn);
+      window.addEventListener("focusout", this.handleFocusOut);
+      this.events.once("shutdown", () => {
+        window.removeEventListener("focusin", this.handleFocusIn);
+        window.removeEventListener("focusout", this.handleFocusOut);
+      });
+
       this.foodTrucks = [];
       this.vehicles = [];
       this.dogs = [];
