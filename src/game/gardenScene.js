@@ -160,15 +160,21 @@ export function createGardenScene({
 
       // WASD/화살표 키는 Phaser가 전역(window)에서 캡처해 preventDefault를 호출하기 때문에,
       // Contact 폼처럼 모달 위에 떠 있는 input/textarea에 포커스가 있어도 "w","a","s","d"
-      // 같은 글자가 입력되지 않고 캐릭터만 움직이는 문제가 있었다. 텍스트 입력 요소에
-      // 포커스가 있는 동안만 전역 캡처를 잠깐 풀어서 타이핑이 정상 동작하게 한다.
+      // 같은 글자가 입력되지 않고 캐릭터(와 캐릭터를 따라가는 카메라)만 움직이는 문제가
+      // 있었다. 텍스트 입력 요소에 포커스가 있는 동안은 전역 캡처를 풀어 타이핑은 정상
+      // 동작하게 하고, update()에서도 이 플래그로 키보드 이동 입력 자체를 무시한다.
+      this.isTypingInForm = false;
       const isTypingTarget = (el) =>
         !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
       this.handleFocusIn = (e) => {
-        if (isTypingTarget(e.target)) this.input.keyboard.disableGlobalCapture();
+        if (!isTypingTarget(e.target)) return;
+        this.isTypingInForm = true;
+        this.input.keyboard.disableGlobalCapture();
       };
       this.handleFocusOut = (e) => {
-        if (isTypingTarget(e.target)) this.input.keyboard.enableGlobalCapture();
+        if (!isTypingTarget(e.target)) return;
+        this.isTypingInForm = false;
+        this.input.keyboard.enableGlobalCapture();
       };
       window.addEventListener("focusin", this.handleFocusIn);
       window.addEventListener("focusout", this.handleFocusOut);
@@ -1936,7 +1942,7 @@ export function createGardenScene({
       let vx = 0;
       let vy = 0;
 
-      if (this.cursors) {
+      if (this.cursors && !this.isTypingInForm) {
         if (this.cursors.left.isDown || this.cursors.left2.isDown) vx -= 1;
         if (this.cursors.right.isDown || this.cursors.right2.isDown) vx += 1;
         if (this.cursors.up.isDown || this.cursors.up2.isDown) vy -= 1;
@@ -2070,6 +2076,7 @@ export function createGardenScene({
 
       if (
         this.interactKey &&
+        !this.isTypingInForm &&
         Phaser.Input.Keyboard.JustDown(this.interactKey) &&
         nearest
       ) {
