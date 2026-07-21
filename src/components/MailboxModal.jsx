@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import DownloadButton from "./DownloadButton";
-import { RESUME_FILE, PORTFOLIO_FILE } from "../utils/fileDownload";
+import { RESUME_FILE, PORTFOLIO_FILE, CAREER_FILE } from "../utils/fileDownload";
 
 export default function MailboxModal({ onClose }) {
   useEffect(() => {
@@ -43,6 +43,13 @@ export default function MailboxModal({ onClose }) {
               icon="📁"
               label="포트폴리오 다운로드"
               ariaLabel="포트폴리오 PDF 다운로드 또는 새 탭에서 열기"
+              className="download-btn-large"
+            />
+            <DownloadButton
+              file={CAREER_FILE}
+              icon="📋"
+              label="경력기술서 다운로드"
+              ariaLabel="경력기술서 PDF 다운로드 또는 새 탭에서 열기"
               className="download-btn-large"
             />
           </div>

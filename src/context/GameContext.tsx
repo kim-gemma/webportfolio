@@ -21,7 +21,6 @@ export interface GameContextValue {
   mailboxModalOpen: boolean;
   aiNpcNear: boolean;
   mobileMenuOpen: boolean;
-  docsModalOpen: boolean;
   openZone: (zoneKey: ZoneKey) => void;
   closeZone: () => void;
   onZoneEnter: (zoneKey: ZoneKey) => void;
@@ -36,7 +35,6 @@ export interface GameContextValue {
   setGameInstance: (instance: GameInstance) => void;
   setIsMobile: (isMobile: boolean) => void;
   setMobileMenuOpen: (open: boolean) => void;
-  setDocsModalOpen: (open: boolean) => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -51,7 +49,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [mailboxModalOpen, setMailboxModalOpen] = useState(false);
   const [aiNpcNear, setAiNpcNear] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [docsModalOpen, setDocsModalOpen] = useState(false);
 
   const openZone = useCallback((zoneKey: ZoneKey) => {
     setActiveZone(zoneKey);
@@ -110,7 +107,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       mailboxModalOpen,
       aiNpcNear,
       mobileMenuOpen,
-      docsModalOpen,
       openZone,
       closeZone,
       onZoneEnter,
@@ -125,7 +121,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setGameInstance,
       setIsMobile,
       setMobileMenuOpen,
-      setDocsModalOpen,
     }),
     [
       activeZone,
@@ -137,7 +132,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       mailboxModalOpen,
       aiNpcNear,
       mobileMenuOpen,
-      docsModalOpen,
       openZone,
       closeZone,
       onZoneEnter,

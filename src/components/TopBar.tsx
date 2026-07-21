@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { useGame } from "../context/GameContext";
 import { ZONES, ZONE_META } from "../config/zonesConfig";
 import ThemeToggle from "./ThemeToggle";
-import DocsModal from "./DocsModal";
 
 const TOP_BAR_LABELS: Record<string, string> = {
   about: "About",
@@ -30,11 +29,8 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
   const {
     hintZone,
     activeZone,
-    closeZone,
     mobileMenuOpen: menuOpen,
     setMobileMenuOpen: setMenuOpen,
-    docsModalOpen: docsOpen,
-    setDocsModalOpen: setDocsOpen,
   } = useGame();
   const highlighted = activeZone || hintZone;
   const headerRef = useRef<HTMLHeadElement>(null);
@@ -66,7 +62,6 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
 
   const handleHomeClick = () => {
     setMenuOpen(false);
-    setDocsOpen(false);
     onHomeSelect();
   };
 
@@ -78,14 +73,7 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
   };
 
   const handleZoneClick = (zoneKey: string) => {
-    setDocsOpen(false);
     onZoneSelect(zoneKey);
-    setMenuOpen(false);
-  };
-
-  const handleDocsClick = () => {
-    closeZone();
-    setDocsOpen(true);
     setMenuOpen(false);
   };
 
@@ -120,14 +108,6 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
         {/* PC: 가로 메뉴. 768px 이하에서는 CSS로 숨기고 햄버거 메뉴를 대신 보여준다 */}
         <nav className="top-bar-nav top-bar-nav-desktop" aria-label="주요 메뉴">
           {renderZoneButtons()}
-          <button
-            type="button"
-            className={`top-bar-link${docsOpen ? " active" : ""}`}
-            onClick={handleDocsClick}
-          >
-            <span className="top-bar-link-icon">📄</span>
-            Docs
-          </button>
         </nav>
 
         {/* 데스크탑/모바일 모두 항상 노출 — 햄버거 메뉴 안에 숨기지 않는다 */}
@@ -158,21 +138,12 @@ export default function TopBar({ onHomeSelect, onZoneSelect }: TopBarProps) {
             <div id="mobile-menu-panel" className="mobile-menu-panel" role="menu">
               <nav className="mobile-menu-nav" aria-label="주요 메뉴">
                 {renderZoneButtons("mobile-menu-link")}
-                <button
-                  type="button"
-                  className="top-bar-link mobile-menu-link"
-                  onClick={handleDocsClick}
-                >
-                  <span className="top-bar-link-icon">📄</span>
-                  Docs
-                </button>
               </nav>
             </div>
           </>
         )}
       </header>
 
-      {docsOpen && <DocsModal onClose={() => setDocsOpen(false)} />}
     </>
   );
 }
